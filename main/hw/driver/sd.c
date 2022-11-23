@@ -42,10 +42,10 @@ bool sdInit(void)
   mutex_lock = xSemaphoreCreateMutex();
 
   slot_config.width = 1;
-  slot_config.cd  = GPIO_NUM_NC;
-  slot_config.clk = GPIO_NUM_12;
-  slot_config.cmd = GPIO_NUM_11;
-  slot_config.d0  = GPIO_NUM_13;
+  slot_config.cd  = GPIO_NUM_43;
+  slot_config.clk = GPIO_NUM_41;
+  slot_config.cmd = GPIO_NUM_44;
+  slot_config.d0  = GPIO_NUM_40;
 
 
   err = host.init();
@@ -226,7 +226,7 @@ bool sdIsInit(void)
 
 bool sdIsDetected(void)
 {
-  return gpio_get_level(GPIO_NUM_10) == 1 ? true : false;
+  return gpio_get_level(GPIO_NUM_43) == 0 ? true : false;
 }
 
 sd_state_t sdGetState(void)

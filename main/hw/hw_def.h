@@ -29,9 +29,9 @@
 
 
 #define _USE_HW_RTOS
-//#define _USE_HW_SD
+#define _USE_HW_SD
 #define _USE_HW_NVS
-//#define _USE_HW_FATFS
+#define _USE_HW_FATFS
 #define _USE_HW_CDC
 
 

@@ -29,7 +29,7 @@ bool hwInit(void)
   cdcInit();
   uartInit();
   uartOpen(_DEF_UART1, 115200);
-  
+
   logOpen(HW_LOG_CH, 115200);
 
   bootMsg();
@@ -39,8 +39,8 @@ bool hwInit(void)
   logPrintf("\n");
 
   nvsInit();
-  //sdInit();
-  //fatfsInit();
+  sdInit();
+  fatfsInit();
 
   return true;
 }
