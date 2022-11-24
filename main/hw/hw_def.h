@@ -55,6 +55,8 @@
 #define _USE_HW_PWM
 #define      HW_PWM_MAX_CH          1
 
+#define _USE_HW_I2C
+#define      HW_I2C_MAX_CH          1
 
 
 

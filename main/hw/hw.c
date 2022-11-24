@@ -39,6 +39,7 @@ bool hwInit(void)
   logPrintf("\n");
 
   nvsInit();
+  i2cInit();
   sdInit();
   fatfsInit();
 

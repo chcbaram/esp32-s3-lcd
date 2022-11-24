@@ -25,6 +25,7 @@ extern "C" {
 #include "button.h"
 #include "sd.h"
 #include "fatfs.h"
+#include "i2c.h"
 
 
 bool hwInit(void);
