@@ -27,6 +27,9 @@ extern "C" {
 #include "fatfs.h"
 #include "i2c.h"
 
+#include "touch/ft6236.h"
+
+
 
 bool hwInit(void);
 

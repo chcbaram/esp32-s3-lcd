@@ -1,0 +1,253 @@
+#include "touch/ft6236.h"
+#include "i2c.h"
+#include "cli.h"
+#include "cli_gui.h"
+
+
+#define FT6236_TOUCH_WIDTH    480
+#define FT6236_TOUCH_HEIGTH   320
+
+
+
+static void cliCmd(cli_args_t *args);
+static bool readRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length);
+//static bool writeRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length);
+
+
+static uint8_t i2c_ch   = _DEF_I2C1;
+static uint8_t i2c_addr = 0x38; 
+static bool is_init = false;
+static bool is_detected = false;
+
+
+
+
+bool ft6236Init(void)
+{
+  bool ret = false;
+
+
+  if (i2cIsBegin(i2c_ch) == true)
+    ret = true;
+  else
+    ret = i2cBegin(i2c_ch, 400);
+
+
+  if (ret == true && i2cIsDeviceReady(i2c_ch, i2c_addr))
+    is_detected = true;
+  else
+    ret = false;
+
+
+  logPrintf("[%s] ft6236Init()\n", ret ? "OK":"NG");
+
+  cliAdd("ft6236", cliCmd);
+
+  return ret;
+}
+
+bool readRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length)
+{
+  bool ret;
+
+  // Set Reg Addr
+  ret = i2cWriteData(i2c_ch, i2c_addr, &reg_addr, 1, 10);
+  if (ret == true)
+  {
+    // Read Data
+    ret = i2cReadData(i2c_ch, i2c_addr, p_data, length, 50);
+  } 
+
+  return ret;
+}
+
+#if 0
+bool writeRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length)
+{
+  bool ret;
+
+  // Set Reg Addr
+  ret = i2cWriteData(i2c_ch, i2c_addr, &reg_addr, 1, 10);
+  if (ret == true)
+  {
+    // Write Data
+    ret = i2cWriteData(i2c_ch, i2c_addr, p_data, length, 50);
+  } 
+
+  return ret;
+}
+#endif
+
+bool ft6236GetInfo(ft6236_info_t *p_info)
+{
+  bool ret;
+  uint8_t buf[14];
+
+  ret = readRegs(0x00, buf, 14);
+
+  if (ret == true)
+  {
+    p_info->gest_id = buf[0x01];
+    p_info->count   = buf[0x02] & 0x0F;
+    if (p_info->count <= 2)
+    {
+      for (int i=0; i<p_info->count; i++)
+      {
+        uint16_t x;
+        uint16_t y;
+
+        p_info->point[i].id     = (buf[0x05+(6*i)] & 0xF0) >> 4;
+        p_info->point[i].event  = (buf[0x03+(6*i)] & 0xC0) >> 6;
+        p_info->point[i].weight = (buf[0x07+(6*i)] & 0xFF) >> 0;
+        p_info->point[i].area   = (buf[0x08+(6*i)] & 0xFF) >> 4;
+
+        x  = (buf[0x03+(6*i)] & 0x0F) << 8;
+        x |= (buf[0x04+(6*i)] & 0xFF) << 0;
+        y  = (buf[0x05+(6*i)] & 0x0F) << 8;
+        y |= (buf[0x06+(6*i)] & 0xFF) << 0;
+
+        p_info->point[i].x = y;
+        p_info->point[i].y = FT6236_TOUCH_HEIGTH - x; 
+      }
+    }
+    else
+    {
+      ret = false;
+    }
+  }
+
+  return ret;
+}
+
+void cliCmd(cli_args_t *args)
+{
+  bool ret = false;
+
+
+  if (args->argc == 1 && args->isStr(0, "info"))
+  {
+    cliPrintf("is_init     : %s\n", is_init ? "True" : "False");
+    cliPrintf("is_detected : %s\n", is_detected ? "True" : "False");
+
+    ret = true;
+  }
+
+  if (args->argc == 3 && args->isStr(0, "read"))
+  {
+    uint8_t addr;
+    uint8_t len;
+    uint8_t data;
+
+    addr = args->getData(1);
+    len  = args->getData(2);
+
+    for (int i=0; i<len; i++)
+    {
+      if (readRegs(addr + i, &data, 1) == true)
+      {
+        cliPrintf("0x%02x : 0x%02X\n", addr + i, data);
+      }
+      else
+      {
+        cliPrintf("readRegs() Fail\n");
+        break;
+      }
+    }
+
+    ret = true;
+  }
+
+  if (args->argc == 2 && args->isStr(0, "get") && args->isStr(1, "info"))
+  {
+    ft6236_info_t info;
+    uint32_t pre_time;
+    uint32_t exe_time;
+
+    while(cliKeepLoop())
+    {
+      pre_time = micros();
+      if (ft6236GetInfo(&info) == true)
+      {
+        exe_time = micros()-pre_time;
+
+        cliPrintf("cnt : %d %3dus, ", info.count, exe_time);
+
+        for (int i=0; i<info.count; i++)
+        {
+          cliPrintf(" - ");
+          cliPrintf("id=%d evt=%2d x=%3d y=%3d w=%3d a=%3d ", 
+            info.point[i].id,      
+            info.point[i].event,      
+            info.point[i].x, 
+            info.point[i].y, 
+            info.point[i].weight, 
+            info.point[i].area
+            );
+        }
+
+        cliPrintf("\n");
+      }
+      else
+      {
+        cliPrintf("ft6236GetInfo() Fail\n");
+        break;
+      }
+      delay(33);
+    }
+    ret = true;
+  }
+
+  if (args->argc == 1 && args->isStr(0, "gui"))
+  {
+    ft6236_info_t info;
+    ft6236_info_t info_pre;
+
+    cliGui()->initScreen(80, 24);
+
+    while(cliKeepLoop())
+    {
+      cliGui()->drawBox(0, 0, 480/10 + 1, 320/20 + 1, "");
+
+      if (ft6236GetInfo(&info) == true)
+      {
+        uint16_t x;
+        uint16_t y;
+
+        for (int i=0; i<info_pre.count; i++)
+        {
+          if (info.point[i].x != info_pre.point[i].x || 
+              info.point[i].y != info_pre.point[i].y ||
+              info.count != info_pre.count)
+          {
+            x = info_pre.point[i].x/10;
+            y = info_pre.point[i].y/20;          
+            cliGui()->eraseBox(x, y, 6, 3);
+            cliGui()->movePrintf(x+2, y+1, " ");
+            cliGui()->movePrintf(x, y+3, "       ");
+          }
+        }
+        for (int i=0; i<info.count; i++)
+        {
+          x = info.point[i].x/10;
+          y = info.point[i].y/20;
+          cliGui()->drawBox(x, y, 6, 3, "");
+          cliGui()->movePrintf(x+2, y+1, "%d", info.point[i].id);
+          cliGui()->movePrintf(x, y+3, "%3d:%3d", info.point[i].x, info.point[i].y);
+        }
+        info_pre = info;
+      }
+      delay(33);
+    }
+
+    cliGui()->closeScreen();    
+    ret = true;
+  }
+
+  if (ret == false)
+  {
+    cliPrintf("ft6236 info\n");
+    cliPrintf("ft6236 read addr[0~0xFF] len[0~255]\n");
+    cliPrintf("ft6236 get info\n");
+    cliPrintf("ft6236 gui\n");
+  }
+}

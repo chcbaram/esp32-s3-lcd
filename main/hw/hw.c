@@ -43,6 +43,9 @@ bool hwInit(void)
   sdInit();
   fatfsInit();
 
+
+  ft6236Init();
+
   return true;
 }
 

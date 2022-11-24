@@ -204,46 +204,26 @@ bool i2cReadByte (uint8_t ch, uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_d
 bool i2cReadBytes(uint8_t ch, uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_data, uint32_t length, uint32_t timeout)
 {
   bool ret = false;
-  #if 0
-  HAL_StatusTypeDef i2c_ret;
-  I2C_HandleTypeDef *p_handle = i2c_tbl[ch].p_hi2c;
 
-  if (ch >= I2C_MAX_CH)
-  {
-    return false;
-  }
-
-  i2c_ret = HAL_I2C_Mem_Read(p_handle, (uint16_t)(dev_addr << 1), reg_addr, I2C_MEMADD_SIZE_8BIT, p_data, length, timeout);
-
-  if( i2c_ret == HAL_OK )
-  {
-    ret = true;
-  }
-  else
-  {
-    ret = false;
-  }
-  #endif 
   return ret;
 }
 
 bool i2cReadData(uint8_t ch, uint16_t dev_addr, uint8_t *p_data, uint32_t length, uint32_t timeout)
 {
   bool ret = false;
-  int i2c_ret;
+  esp_err_t esp_ret = ESP_OK;
 
+  if (ch >= I2C_MAX_CH) return false;
+  if (i2cIsBegin(ch) == false) return false;
 
-  if (ch >= I2C_MAX_CH)
-  {
-    return false;
-  }
-  #if 0
-  i2c_ret = i2c_read_timeout_us(i2c_tbl[ch].h_i2c, dev_addr, p_data, length, false, timeout*1000);
-  if (i2c_ret == length)
+  
+  esp_ret = i2c_master_read_from_device(i2c_tbl[ch].i2c_num, dev_addr, p_data, length, timeout);
+  if (esp_ret == ESP_OK)
   {
     ret = true;
   }
-  #endif
+
+  return ret;
 
   return ret;
 }
@@ -256,47 +236,25 @@ bool i2cWriteByte (uint8_t ch, uint16_t dev_addr, uint16_t reg_addr, uint8_t dat
 bool i2cWriteBytes(uint8_t ch, uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_data, uint32_t length, uint32_t timeout)
 {
   bool ret = false;
-  int i2c_ret;
-  uint8_t tx_buf[length+1];
 
-
-  if (ch >= I2C_MAX_CH)
-  {
-    return false;
-  }
-  #if 0
-  tx_buf[0] = reg_addr;
-  for (int i=0; i<length; i++)
-  {
-    tx_buf[1+i] = p_data[i];
-  }
-  i2c_ret = i2c_write_timeout_us(i2c_tbl[ch].h_i2c, dev_addr, tx_buf, length+1, false, timeout*1000); 
-  if (i2c_ret > 0)
-  {
-    ret = true;
-  }
-  #endif
   return ret;
 }
 
 bool i2cWriteData(uint8_t ch, uint16_t dev_addr, uint8_t *p_data, uint32_t length, uint32_t timeout)
 {
   bool ret = false;
-  int i2c_ret;
+  esp_err_t esp_ret = ESP_OK;
 
+  if (ch >= I2C_MAX_CH) return false;
+  if (i2cIsBegin(ch) == false) return false;
 
-  if (ch >= I2C_MAX_CH)
-  {
-    return false;
-  }
-
-  #if 0
-  i2c_ret = i2c_write_timeout_us(i2c_tbl[ch].h_i2c, dev_addr, p_data, length, false, timeout*1000); 
-  if (i2c_ret == length)
+  
+  esp_ret = i2c_master_write_to_device(i2c_tbl[ch].i2c_num, dev_addr, p_data, length, timeout);
+  if (esp_ret == ESP_OK)
   {
     ret = true;
   }
-  #endif
+
   return ret;
 }
 

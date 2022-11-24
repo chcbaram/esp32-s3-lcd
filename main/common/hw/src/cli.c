@@ -596,6 +596,13 @@ void cliPrintf(const char *fmt, ...)
   uartWrite(p_cli->ch, (uint8_t *)p_cli->print_buffer, len);
 }
 
+void cliPutch(uint8_t data)
+{
+  cli_t *p_cli = &cli_node;
+  
+  uartWrite(p_cli->ch, &data, 1);
+}
+
 void cliToUpper(char *str)
 {
   uint16_t i;
