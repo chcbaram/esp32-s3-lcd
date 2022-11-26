@@ -4,6 +4,12 @@
 #include "cli_gui.h"
 
 
+#ifdef _USE_HW_FT6236
+
+#define lock()      xSemaphoreTake(mutex_lock, portMAX_DELAY);
+#define unLock()    xSemaphoreGive(mutex_lock);
+
+
 #define FT6236_TOUCH_WIDTH    480
 #define FT6236_TOUCH_HEIGTH   320
 
@@ -11,14 +17,14 @@
 
 static void cliCmd(cli_args_t *args);
 static bool readRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length);
-//static bool writeRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length);
+static bool writeRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length);
 
 
 static uint8_t i2c_ch   = _DEF_I2C1;
 static uint8_t i2c_addr = 0x38; 
 static bool is_init = false;
 static bool is_detected = false;
-
+static SemaphoreHandle_t mutex_lock = NULL;
 
 
 
@@ -27,6 +33,11 @@ bool ft6236Init(void)
   bool ret = false;
 
 
+  if (mutex_lock == NULL)
+  {
+    mutex_lock = xSemaphoreCreateMutex();
+  }
+
   if (i2cIsBegin(i2c_ch) == true)
     ret = true;
   else
@@ -34,9 +45,13 @@ bool ft6236Init(void)
 
 
   if (ret == true && i2cIsDeviceReady(i2c_ch, i2c_addr))
+  {    
     is_detected = true;
+  }
   else
+  {
     ret = false;
+  }
 
 
   logPrintf("[%s] ft6236Init()\n", ret ? "OK":"NG");
@@ -50,6 +65,7 @@ bool readRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length)
 {
   bool ret;
 
+  lock();
   // Set Reg Addr
   ret = i2cWriteData(i2c_ch, i2c_addr, &reg_addr, 1, 10);
   if (ret == true)
@@ -57,26 +73,36 @@ bool readRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length)
     // Read Data
     ret = i2cReadData(i2c_ch, i2c_addr, p_data, length, 50);
   } 
+  unLock();
 
   return ret;
 }
 
-#if 0
 bool writeRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length)
 {
   bool ret;
+  uint8_t wr_buf[length + 1];
 
-  // Set Reg Addr
-  ret = i2cWriteData(i2c_ch, i2c_addr, &reg_addr, 1, 10);
-  if (ret == true)
+
+  wr_buf[0] = reg_addr;
+  for (int i=0; i<length; i++)
   {
-    // Write Data
-    ret = i2cWriteData(i2c_ch, i2c_addr, p_data, length, 50);
-  } 
+    wr_buf[1+i] = p_data[i];
+  }
+  ret = i2cWriteData(i2c_ch, i2c_addr, wr_buf, length+1, 10);
 
   return ret;
 }
-#endif
+
+uint16_t ft6236GetWidth(void)
+{
+  return FT6236_TOUCH_WIDTH;
+}
+
+uint16_t ft6236GetHeight(void)
+{
+  return FT6236_TOUCH_HEIGTH;
+}
 
 bool ft6236GetInfo(ft6236_info_t *p_info)
 {
@@ -126,8 +152,28 @@ void cliCmd(cli_args_t *args)
 
   if (args->argc == 1 && args->isStr(0, "info"))
   {
+    uint8_t reg_data;
+
     cliPrintf("is_init     : %s\n", is_init ? "True" : "False");
     cliPrintf("is_detected : %s\n", is_detected ? "True" : "False");
+
+    readRegs(FT6236_REG_DEV_MODE, &reg_data, 1);
+    cliPrintf("DEV_MODE    : 0x%02X (%d)\n", reg_data, reg_data);
+
+    readRegs(FT6236_REG_TH_GROUP, &reg_data, 1);
+    cliPrintf("TH_GROUP    : 0x%02X (%d)\n", reg_data, reg_data);
+
+    readRegs(FT6236_REG_TH_DIFF, &reg_data, 1);
+    cliPrintf("TH_DIFF     : 0x%02X (%d)\n", reg_data, reg_data);
+
+    readRegs(FT6236_REG_CTRL, &reg_data, 1);
+    cliPrintf("CTRL        : 0x%02X (%d)\n", reg_data, reg_data);
+
+    readRegs(FT6236_REG_PERIOID_ACTIVE, &reg_data, 1);
+    cliPrintf("PERIOID A   : 0x%02X (%d)\n", reg_data, reg_data);
+
+    readRegs(FT6236_REG_PERIOID_MONITOR, &reg_data, 1);
+    cliPrintf("PERIOID M   : 0x%02X (%d)\n", reg_data, reg_data);
 
     ret = true;
   }
@@ -170,7 +216,7 @@ void cliCmd(cli_args_t *args)
       {
         exe_time = micros()-pre_time;
 
-        cliPrintf("cnt : %d %3dus, ", info.count, exe_time);
+        cliPrintf("cnt : %d %3dus, g=%d ", info.count, exe_time, info.gest_id);
 
         for (int i=0; i<info.count; i++)
         {
@@ -192,7 +238,7 @@ void cliCmd(cli_args_t *args)
         cliPrintf("ft6236GetInfo() Fail\n");
         break;
       }
-      delay(33);
+      delay(10);
     }
     ret = true;
   }
@@ -236,7 +282,7 @@ void cliCmd(cli_args_t *args)
         }
         info_pre = info;
       }
-      delay(33);
+      delay(10);
     }
 
     cliGui()->closeScreen();    
@@ -251,3 +297,5 @@ void cliCmd(cli_args_t *args)
     cliPrintf("ft6236 gui\n");
   }
 }
+
+#endif

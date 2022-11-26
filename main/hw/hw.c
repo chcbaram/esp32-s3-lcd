@@ -42,9 +42,7 @@ bool hwInit(void)
   i2cInit();
   sdInit();
   fatfsInit();
-
-
-  ft6236Init();
+  touchInit();
 
   return true;
 }

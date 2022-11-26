@@ -36,6 +36,7 @@
 #define _USE_HW_FT6236
 
 
+
 #define _USE_HW_UART
 #define      HW_UART_MAX_CH         2
 
@@ -63,6 +64,7 @@
 #define _USE_HW_I2C
 #define      HW_I2C_MAX_CH          1
 
-
+#define _USE_HW_TOUCH
+#define      HW_TOUCH_MAX_CH        2
 
 #endif /* MAIN_HW_HW_DEF_H_ */

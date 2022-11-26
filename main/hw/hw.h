@@ -26,8 +26,7 @@ extern "C" {
 #include "sd.h"
 #include "fatfs.h"
 #include "i2c.h"
-
-#include "touch/ft6236.h"
+#include "touch.h"
 
 
 

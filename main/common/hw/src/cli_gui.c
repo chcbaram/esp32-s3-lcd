@@ -37,8 +37,8 @@ static void initScreen(int16_t w, int16_t h)
 
   cliGui()->showCursor(false);
   cliGui()->setAttr(A_NORMAL);
-  cliGui()->clear();
   cliGui()->move(0, 0);
+  cliGui()->clear();
   cli_gui_is_init = true;
 }
 
