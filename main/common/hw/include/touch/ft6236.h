@@ -13,6 +13,13 @@
 
 #define FT6236_REG_DEV_MODE                0x00
 #define FT6236_REG_GEST_ID                 0x01
+#define FT6236_REG_TD_STATUS               0x02
+#define FT6236_REG_P_XH                    0x03
+#define FT6236_REG_P_XL                    0x04
+#define FT6236_REG_P_YH                    0x05
+#define FT6236_REG_P_YL                    0x06
+#define FT6236_REG_P_WEIGHT                0x07
+#define FT6236_REG_P_MISC                  0x08
 #define FT6236_REG_TH_GROUP                0x80
 #define FT6236_REG_TH_DIFF                 0x85
 #define FT6236_REG_CTRL                    0x86

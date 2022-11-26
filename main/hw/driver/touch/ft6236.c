@@ -53,7 +53,7 @@ bool ft6236Init(void)
     ret = false;
   }
 
-
+  is_init = ret;
   logPrintf("[%s] ft6236Init()\n", ret ? "OK":"NG");
 
   cliAdd("ft6236", cliCmd);
@@ -113,8 +113,8 @@ bool ft6236GetInfo(ft6236_info_t *p_info)
 
   if (ret == true)
   {
-    p_info->gest_id = buf[0x01];
-    p_info->count   = buf[0x02] & 0x0F;
+    p_info->gest_id = buf[FT6236_REG_GEST_ID];
+    p_info->count   = buf[FT6236_REG_TD_STATUS] & 0x0F;
     if (p_info->count <= 2)
     {
       for (int i=0; i<p_info->count; i++)
@@ -122,15 +122,15 @@ bool ft6236GetInfo(ft6236_info_t *p_info)
         uint16_t x;
         uint16_t y;
 
-        p_info->point[i].id     = (buf[0x05+(6*i)] & 0xF0) >> 4;
-        p_info->point[i].event  = (buf[0x03+(6*i)] & 0xC0) >> 6;
-        p_info->point[i].weight = (buf[0x07+(6*i)] & 0xFF) >> 0;
-        p_info->point[i].area   = (buf[0x08+(6*i)] & 0xFF) >> 4;
+        p_info->point[i].id     = (buf[FT6236_REG_P_YH     + (6*i)] & 0xF0) >> 4;
+        p_info->point[i].event  = (buf[FT6236_REG_P_XH     + (6*i)] & 0xC0) >> 6;
+        p_info->point[i].weight = (buf[FT6236_REG_P_WEIGHT + (6*i)] & 0xFF) >> 0;
+        p_info->point[i].area   = (buf[FT6236_REG_P_MISC   + (6*i)] & 0xFF) >> 4;
 
-        x  = (buf[0x03+(6*i)] & 0x0F) << 8;
-        x |= (buf[0x04+(6*i)] & 0xFF) << 0;
-        y  = (buf[0x05+(6*i)] & 0x0F) << 8;
-        y |= (buf[0x06+(6*i)] & 0xFF) << 0;
+        x  = (buf[FT6236_REG_P_XH + (6*i)] & 0x0F) << 8;
+        x |= (buf[FT6236_REG_P_XL + (6*i)] & 0xFF) << 0;
+        y  = (buf[FT6236_REG_P_YH + (6*i)] & 0x0F) << 8;
+        y |= (buf[FT6236_REG_P_YL + (6*i)] & 0xFF) << 0;
 
         p_info->point[i].x = y;
         p_info->point[i].y = FT6236_TOUCH_HEIGTH - x; 
