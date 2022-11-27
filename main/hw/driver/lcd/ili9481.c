@@ -78,7 +78,7 @@ bool ili9481Init(void)
 
 
   lcd_bus.bus_width = 16;           // 16bits
-  lcd_bus.pclk_hz   = 2*1000*1000; // 10Mhz
+  lcd_bus.pclk_hz   = 10*1000*1000; // 10Mhz
 
   ret = initDbiBus(&lcd_bus);
   logPrintf("[%s] initDbiBus()\n", ret ? "OK":"NG");
