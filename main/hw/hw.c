@@ -9,7 +9,7 @@
 
 
 #include "hw.h"
-
+#include "lcd/ili9481.h"
 
 static void bootMsg(void);
 
@@ -44,6 +44,9 @@ bool hwInit(void)
   fatfsInit();
   touchInit();
 
+  pwmWrite(0, 200);
+  ili9481Init();
+  
   return true;
 }
 

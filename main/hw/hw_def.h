@@ -67,4 +67,10 @@
 #define _USE_HW_TOUCH
 #define      HW_TOUCH_MAX_CH        2
 
+#define _USE_HW_ILI9481
+#define      HW_ILI9481_IF_MODE     ILI9481_IF_16BIT
+#define      HW_ILI9481_WIDTH       480
+#define      HW_ILI9481_HEIGHT      320
+
+
 #endif /* MAIN_HW_HW_DEF_H_ */

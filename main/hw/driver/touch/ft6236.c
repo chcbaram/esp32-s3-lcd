@@ -6,6 +6,7 @@
 
 #ifdef _USE_HW_FT6236
 
+
 #define lock()      xSemaphoreTake(mutex_lock, portMAX_DELAY);
 #define unLock()    xSemaphoreGive(mutex_lock);
 
@@ -17,7 +18,7 @@
 
 static void cliCmd(cli_args_t *args);
 static bool readRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length);
-static bool writeRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length);
+//static bool writeRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length);
 
 
 static uint8_t i2c_ch   = _DEF_I2C1;
@@ -78,6 +79,7 @@ bool readRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length)
   return ret;
 }
 
+/*
 bool writeRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length)
 {
   bool ret;
@@ -93,6 +95,7 @@ bool writeRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length)
 
   return ret;
 }
+*/
 
 uint16_t ft6236GetWidth(void)
 {
