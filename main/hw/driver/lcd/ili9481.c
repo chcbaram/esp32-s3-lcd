@@ -99,6 +99,7 @@ bool ili9481Init(void)
   dbiWriteParam(&lcd_bus, ILI9481_W_SET_ADDR_MODE,    (uint8_t[]){0x28}, 1);
   dbiWriteParam(&lcd_bus, ILI9481_W_SET_PIXEL_FORMAT, (uint8_t[]){0x55}, 1);
   dbiWriteParam(&lcd_bus, ILI9481_C_ENTER_INVERT_MODE, NULL, 0);
+  dbiWriteParam(&lcd_bus, ILI9481_WR_POWER_SET,       (uint8_t[]){0x07, 0x42, 0x15}, 3);
 
 
   dbiWriteParam(&lcd_bus, ILI9481_WR_FRAME_RATE_INV_CONTROL,(uint8_t[]){3}, 1); // 72Hz
@@ -108,10 +109,6 @@ bool ili9481Init(void)
   dbiWriteParam(&lcd_bus, ILI9481_W_SET_TEAR_ON,      (uint8_t[]){0}, 1);
 
   dbiWriteParam(&lcd_bus, ILI9481_C_SET_DISPLAY_ON,    NULL, 0);
-
-
-  
-  dbiWriteParam(&lcd_bus, 0xD0, (uint8_t[]){0x07, 0x42, 0x15}, 3);
 
   buf[0] = 0;
   buf[1] = 0;
