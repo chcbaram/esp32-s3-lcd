@@ -123,7 +123,7 @@ bool ili9481Init(void)
   dbiWriteParam(&lcd_bus, ILI9481_W_SET_PAGE_ADDR, buf, 4);
   dbiWriteMemory(&lcd_bus, ILI9481_W_WRITE_MEMORY_START, NULL, 0);
 
-  for (int i=0; i<480*320/4; i+=1)
+  for (int i=1; i<480*320/4; i+=1)
   {
     img_buf[0] = 0xF800;
     if (i%480 > 240)
