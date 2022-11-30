@@ -43,7 +43,8 @@ bool hwInit(void)
   sdInit();
   fatfsInit();
   touchInit();
-
+  lcdcInit();
+  
   pwmWrite(0, 200);
   ili9481Init();
   

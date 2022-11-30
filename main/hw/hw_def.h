@@ -72,5 +72,7 @@
 #define      HW_ILI9481_WIDTH       480
 #define      HW_ILI9481_HEIGHT      320
 
+#define _USE_HW_LCDC
+
 
 #endif /* MAIN_HW_HW_DEF_H_ */
