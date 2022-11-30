@@ -103,6 +103,7 @@ bool lcdcBegin(uint16_t width, uint16_t height, uint8_t bus_width, uint32_t freq
 
   is_begin = ret;
 
+  logPrintf("[%s] }\n", ret ? "OK":"NG");
   return ret;
 }
 
@@ -396,7 +397,7 @@ bool lcdcWritePoll(lcdc_write_t *p_write, uint32_t timeout_ms)
     // flush framebuffer from cache to the physical PSRAM
     Cache_WriteBack_Addr((uint32_t)p_write->p_data, p_write->data_length);
   }
-  
+
   if (p_write->data_length)
   { 
     gdma_start(bus->dma_chan, (intptr_t)(bus->dma_nodes));
