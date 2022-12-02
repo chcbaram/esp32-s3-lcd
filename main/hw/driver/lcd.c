@@ -230,7 +230,7 @@ void cliLcd(cli_args_t *args)
 
     for (int cnt=0; cnt<10; cnt++)
     {
-      uint16_t color[3] = {0xF800, 0x07E0, 0x001F};
+      uint16_t color[3] = {red, green, blue};
 
       lcdClearBuffer(color[cnt%3]);
 
