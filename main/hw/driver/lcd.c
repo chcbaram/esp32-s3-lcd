@@ -213,7 +213,7 @@ void cliLcd(cli_args_t *args)
 
   if (args->argc == 1 && args->isStr(0, "info") == true)
   {
-    cliPrintf("Driver : ST7789\n");
+    cliPrintf("Driver : ILI9481\n");
     cliPrintf("Width  : %d\n", LCD_WIDTH);
     cliPrintf("Height : %d\n", LCD_HEIGHT);
     cliPrintf("BKL    : %d%%\n", lcdGetBackLight());
