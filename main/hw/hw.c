@@ -44,10 +44,8 @@ bool hwInit(void)
   fatfsInit();
   touchInit();
   lcdcInit();
-  
-  pwmWrite(0, 200);
-  ili9481Init();
-  
+  lcdInit();
+
   return true;
 }
 

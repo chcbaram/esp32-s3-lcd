@@ -9,16 +9,11 @@ extern "C" {
 
 
 #ifdef _USE_HW_ILI9481
+#include "lcd.h"
 #include "ili9481_regs.h"
 
 
 
-#define ILI9481_IF_SPI     1
-#define ILI9481_IF_8BIT    2
-#define ILI9481_IF_16BIT   3
-
-
-#define ILI9481_IF_MODE   HW_ILI9481_IF_MODE
 #define ILI9481_WIDTH     HW_ILI9481_WIDTH
 #define ILI9481_HEIGHT    HW_ILI9481_HEIGHT
 
@@ -26,6 +21,7 @@ extern "C" {
 
 bool ili9481Init(void);
 
+lcd_driver_t *ili9481GetDriver(void);
 
 
 #endif

@@ -14,13 +14,18 @@ static void cliCmd(cli_args_t *args);
 static bool writeParam(uint8_t cmd, const void *param, uint32_t length);
 static bool writeBuffer(const void *buffer, uint32_t length, uint32_t timeout_ms);
 static bool writeBufferPoll(const void *buffer, uint32_t length, uint32_t timeout_ms);
+
+static bool ili9481Reset(void);
 static bool ili9481InitRegs(void);
+static bool ili9481SendBuffer(void *p_data, uint32_t length, uint32_t timeout_ms);
+static uint16_t ili9481GetWidth(void);
+static uint16_t ili9481GetHeight(void);
+
 
 
 static bool is_init = false;
 
 
-uint16_t  *img_buf = NULL;
 
 
 
@@ -39,65 +44,19 @@ bool ili9481Init(void)
   {
     return false;
   }
+  ili9481Reset();
 
-  ili9481InitRegs();
 
-
-  img_buf = heap_caps_aligned_alloc(64, 
-                                    ILI9481_WIDTH * ILI9481_HEIGHT * sizeof(uint16_t), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-  assert(img_buf);
-
-  writeParam(ILI9481_W_WRITE_MEMORY_START, NULL, 0);
-
-  #if 0
-  for (int i=1; i<480*320/4; i+=1)
-  {
-    img_buf[0] = 0xF800;
-    if (i%480 > 240)
-      img_buf[0] = 0xFFFF;
-
-    writeBufferPoll(&img_buf[0], 2, 100);
-  }
-  for (int i=0; i<480*320/4; i+=1)
-  {
-    img_buf[0] = 0x07E0;
-    writeBufferPoll(&img_buf[0], 2, 100);
-  }
-  for (int i=0; i<480*320/4; i+=1)
-  {
-    img_buf[0] = 0x001F;
-    writeBufferPoll(&img_buf[0], 2, 100);
-  }
-  for (int i=0; i<480*320/4; i+=1)
-  {
-    img_buf[0] = 0x0000;
-    writeBufferPoll(&img_buf[0], 2, 100);
-  }
-  #else
-  uint32_t pre_time;
-  uint32_t exe_time;
-
-  for (int cnt=0; cnt<10; cnt++)
-  {
-    uint16_t color[3] = {0xF800, 0x07E0, 0x001F};
-
-    for (int i=0; i<480*320; i++)
-    {
-      img_buf[i] = color[cnt%3];
-    }
-    pre_time = micros();
-    writeBuffer(img_buf, 480*320*sizeof(uint16_t), 500);
-    exe_time = micros()-pre_time;
-    logPrintf("draw time : %d us, %d fps\n", exe_time, 1000000/exe_time);
-
-    delay(500);
-  }
-
-  #endif
   is_init = ret;
 
   logPrintf("[%s] }\n", ret ? "OK":"NG");
   cliAdd("ili9481", cliCmd);
+  return true;
+}
+
+bool ili9481Reset(void)
+{
+  ili9481InitRegs();
   return true;
 }
 
@@ -137,6 +96,65 @@ bool ili9481InitRegs(void)
   writeParam(ILI9481_W_SET_PAGE_ADDR, buf, 4);
 
   return true;
+}
+
+bool ili9481SetCallBack(void (*p_func)(void))
+{
+  lcdcSetCallBack(p_func);
+  return true;
+}
+
+void ili9481SetWindow(int32_t x, int32_t y, int32_t w, int32_t h)
+{
+  uint8_t buf[4];
+
+  buf[0] = x >> 8;
+  buf[1] = x >> 0;
+  buf[2] = ((w-1) >> 8) & 0xFF;
+  buf[3] = ((w-1) >> 0) & 0xFF;
+  writeParam(ILI9481_W_SET_COLUMN_ADDR, buf, 4);
+
+  buf[0] = y >> 8;
+  buf[1] = y >> 0;
+  buf[2] = ((h-1) >> 8) & 0xFF;
+  buf[3] = ((h-1) >> 0) & 0xFF;
+  writeParam(ILI9481_W_SET_PAGE_ADDR, buf, 4);
+}
+
+uint16_t ili9481GetWidth(void)
+{
+  return ILI9481_WIDTH;
+}
+
+uint16_t ili9481GetHeight(void)
+{
+  return ILI9481_HEIGHT;
+}
+
+bool ili9481SendBuffer(void *p_data, uint32_t length, uint32_t timeout_ms)
+{
+  bool ret = true;
+
+  ret &= writeParam(ILI9481_W_WRITE_MEMORY_START, NULL, 0);
+  ret &= writeBuffer(p_data, length, timeout_ms);
+
+  return ret;
+}
+  
+lcd_driver_t *ili9481GetDriver(void)
+{
+  static lcd_driver_t lcd_driver = 
+  {
+    .init         = ili9481Init,
+    .reset        = ili9481Reset,
+    .setWindow    = ili9481SetWindow,
+    .sendBuffer   = ili9481SendBuffer,
+    .getWidth     = ili9481GetWidth,
+    .getHeight    = ili9481GetHeight,
+    .setCallBack  = ili9481SetCallBack, 
+  };
+
+  return &lcd_driver;
 }
 
 bool writeParam(uint8_t cmd, const void *param, uint32_t length)

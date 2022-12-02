@@ -24,7 +24,7 @@ typedef struct
 
 bool lcdcInit(void);
 bool lcdcBegin(uint16_t width, uint16_t height, uint8_t bus_width, uint32_t freq_mhz);
-bool lcdcSetCallback(void (*p_func)(void));
+bool lcdcSetCallBack(void (*p_func)(void));
 bool lcdcIsBusy(void);
 bool lcdcWrite(lcdc_write_t *p_write, uint32_t timeout_ms);
 bool lcdcWritePoll(lcdc_write_t *p_write, uint32_t timeout_ms);

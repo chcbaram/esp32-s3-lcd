@@ -72,7 +72,7 @@ static lcd_bus_t lcd_bus;
 static bool is_init = false;
 static bool is_begin = false;
 static bool is_busy = false;
-
+static void (*p_call_func)(void) = NULL;
 
 
 
@@ -107,9 +107,9 @@ bool lcdcBegin(uint16_t width, uint16_t height, uint8_t bus_width, uint32_t freq
   return ret;
 }
 
-bool lcdcSetCallback(void (*p_func)(void))
+bool lcdcSetCallBack(void (*p_func)(void))
 {
-  
+  p_call_func = p_func;
   return true;
 }
 
@@ -498,8 +498,12 @@ IRAM_ATTR void lcdcISR(void *args)
   if (intr_status & LCD_LL_EVENT_TRANS_DONE) 
   {
     lcd_ll_clear_interrupt_status(bus->hal.dev, intr_status);
-    logPrintf("lcdcISR Done %X\n", intr_status);
-    is_busy = false;
+    esp_intr_disable(bus->intr);
+    if (p_call_func != NULL)
+    {
+      p_call_func();
+    }
+    is_busy = false;    
   }
 
 }

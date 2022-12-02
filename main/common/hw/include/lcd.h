@@ -108,7 +108,7 @@ typedef struct lcd_driver_t_
   uint16_t (*getWidth)(void);
   uint16_t (*getHeight)(void);
   bool     (*setCallBack)(void (*p_func)(void));
-  bool     (*sendBuffer)(uint8_t *p_data, uint32_t length, uint32_t timeout_ms);
+  bool     (*sendBuffer)(void *p_data, uint32_t length, uint32_t timeout_ms);
 
 } lcd_driver_t;
 
@@ -123,6 +123,7 @@ typedef struct lcd_driver_t_
 
 #endif
 
+#ifdef HW_LCD_LVGL
 typedef struct
 {
   const lvgl_img_t *p_img;
@@ -131,7 +132,7 @@ typedef struct
   int16_t w;
   int16_t h;
 } image_t;
-
+#endif
 
 bool lcdInit(void);
 bool lcdIsInit(void);

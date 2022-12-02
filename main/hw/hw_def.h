@@ -34,7 +34,7 @@
 #define _USE_HW_FATFS
 #define _USE_HW_CDC
 #define _USE_HW_FT6236
-
+#define _USE_HW_LCDC
 
 
 #define _USE_HW_UART
@@ -68,11 +68,13 @@
 #define      HW_TOUCH_MAX_CH        2
 
 #define _USE_HW_ILI9481
-#define      HW_ILI9481_IF_MODE     ILI9481_IF_16BIT
 #define      HW_ILI9481_WIDTH       480
 #define      HW_ILI9481_HEIGHT      320
 
-#define _USE_HW_LCDC
+#define _USE_HW_LCD
+#define      HW_LCD_WIDTH           HW_ILI9481_WIDTH
+#define      HW_LCD_HEIGHT          HW_ILI9481_HEIGHT
+
 
 
 #endif /* MAIN_HW_HW_DEF_H_ */
