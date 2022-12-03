@@ -42,10 +42,10 @@ bool hwInit(void)
   i2cInit();
   sdInit();
   fatfsInit();
-  touchInit();
   lcdcInit();
   lcdInit();
-
+  touchInit();
+  
   return true;
 }
 

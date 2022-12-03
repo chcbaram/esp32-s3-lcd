@@ -23,11 +23,14 @@
 #define _HW_DEF_RTOS_THREAD_PRI_BUTTON        5
 #define _HW_DEF_RTOS_THREAD_PRI_SD            5
 #define _HW_DEF_RTOS_THREAD_PRI_TE            5
+#define _HW_DEF_RTOS_THREAD_PRI_FT6236        5
+
 
 #define _HW_DEF_RTOS_THREAD_MEM_CLI           (4*1024)
 #define _HW_DEF_RTOS_THREAD_MEM_BUTTON        (1*1024)
 #define _HW_DEF_RTOS_THREAD_MEM_SD            (4*1024)
 #define _HW_DEF_RTOS_THREAD_MEM_TE            (2*1024)
+#define _HW_DEF_RTOS_THREAD_MEM_FT6236        (2*1024)
 
 
 #define _USE_HW_RTOS

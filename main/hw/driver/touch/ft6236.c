@@ -18,7 +18,8 @@
 
 static void cliCmd(cli_args_t *args);
 static bool readRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length);
-//static bool writeRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length);
+static bool writeRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length);
+static void ft6236Thread(void* arg);
 
 
 static uint8_t i2c_ch   = _DEF_I2C1;
@@ -26,6 +27,8 @@ static uint8_t i2c_addr = 0x38;
 static bool is_init = false;
 static bool is_detected = false;
 static SemaphoreHandle_t mutex_lock = NULL;
+
+
 
 
 
@@ -48,18 +51,49 @@ bool ft6236Init(void)
   if (ret == true && i2cIsDeviceReady(i2c_ch, i2c_addr))
   {    
     is_detected = true;
+
+    xTaskCreate(ft6236Thread, "ft6236Thread", _HW_DEF_RTOS_THREAD_MEM_FT6236, NULL, _HW_DEF_RTOS_THREAD_PRI_FT6236, NULL);      
   }
   else
   {
     ret = false;
   }
 
-  is_init = ret;
   logPrintf("[%s] ft6236Init()\n", ret ? "OK":"NG");
 
   cliAdd("ft6236", cliCmd);
 
   return ret;
+}
+
+void ft6236Thread(void* arg)
+{
+  while(1)
+  {
+    uint8_t data;
+
+
+    data = 0;  
+    writeRegs(FT6236_REG_DEV_MODE, &data, 1);
+
+    data = 0;  // Active Always
+    writeRegs(FT6236_REG_CTRL, &data, 1);
+
+    data = 255; 
+    writeRegs(FT6236_REG_PERIOID_ACTIVE, &data, 1);
+    delay(2500);
+
+    data = 10; 
+    writeRegs(FT6236_REG_PERIOID_ACTIVE, &data, 1);
+    data = 80; // 감도 
+    writeRegs(FT6236_REG_TH_GROUP, &data, 1);  
+
+    is_init = true;
+    while(1)
+    {
+      delay(10);
+    }
+  }
 }
 
 bool readRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length)
@@ -79,7 +113,6 @@ bool readRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length)
   return ret;
 }
 
-/*
 bool writeRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length)
 {
   bool ret;
@@ -95,7 +128,6 @@ bool writeRegs(uint8_t reg_addr, uint8_t *p_data, uint32_t length)
 
   return ret;
 }
-*/
 
 uint16_t ft6236GetWidth(void)
 {
@@ -112,8 +144,13 @@ bool ft6236GetInfo(ft6236_info_t *p_info)
   bool ret;
   uint8_t buf[14];
 
-  ret = readRegs(0x00, buf, 14);
+  if (is_init == false)
+  {
+    p_info->count = 0;
+    return false;
+  }
 
+  ret = readRegs(0x00, buf, 14);
   if (ret == true)
   {
     p_info->gest_id = buf[FT6236_REG_GEST_ID];
@@ -201,6 +238,27 @@ void cliCmd(cli_args_t *args)
         cliPrintf("readRegs() Fail\n");
         break;
       }
+    }
+
+    ret = true;
+  }
+
+  if (args->argc == 3 && args->isStr(0, "write"))
+  {
+    uint8_t addr;
+    uint8_t data;
+
+    addr = args->getData(1);
+    data = args->getData(2);
+
+
+    if (writeRegs(addr, &data, 1) == true)
+    {
+      cliPrintf("0x%02x : 0x%02X\n", addr, data);
+    }
+    else
+    {
+      cliPrintf("writeRegs() Fail\n");
     }
 
     ret = true;
@@ -296,6 +354,7 @@ void cliCmd(cli_args_t *args)
   {
     cliPrintf("ft6236 info\n");
     cliPrintf("ft6236 read addr[0~0xFF] len[0~255]\n");
+    cliPrintf("ft6236 write addr[0~0xFF] data \n");
     cliPrintf("ft6236 get info\n");
     cliPrintf("ft6236 gui\n");
   }
