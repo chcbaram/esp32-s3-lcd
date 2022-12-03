@@ -18,6 +18,8 @@ extern "C" {
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
+#include "freertos/queue.h"
+#include "freertos/task.h"
 #include "esp_system.h"
 #include "spi_flash_mmap.h"
 #include "esp_task_wdt.h"

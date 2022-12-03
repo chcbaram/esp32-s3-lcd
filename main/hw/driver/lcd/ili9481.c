@@ -75,13 +75,13 @@ bool ili9481InitRegs(void)
   writeParam(ILI9481_WR_POWER_SET,       (uint8_t[]){0x07, 0x42, 0x15}, 3);
 
 
+
   writeParam(ILI9481_WR_FRAME_RATE_INV_CONTROL,(uint8_t[]){3}, 1); // 72Hz
-  buf[0] = ((ILI9481_HEIGHT/2) >> 8) & 0xFF;
-  buf[1] = ((ILI9481_HEIGHT/2) >> 0) & 0xFF;
+
+  buf[0] = ((0) >> 8) & 0xFF;
+  buf[1] = ((0) >> 0) & 0xFF;
   writeParam(ILI9481_W_SET_TEAR_SCANLINE, buf, 2);
   writeParam(ILI9481_W_SET_TEAR_ON,      (uint8_t[]){0}, 1);
-
-  writeParam(ILI9481_C_SET_DISPLAY_ON,    NULL, 0);
 
   buf[0] = 0;
   buf[1] = 0;
@@ -94,6 +94,8 @@ bool ili9481InitRegs(void)
   buf[2] = ((ILI9481_HEIGHT-1) >> 8) & 0xFF;
   buf[3] = ((ILI9481_HEIGHT-1) >> 0) & 0xFF;
   writeParam(ILI9481_W_SET_PAGE_ADDR, buf, 4);
+
+  writeParam(ILI9481_C_SET_DISPLAY_ON,    NULL, 0);
 
   return true;
 }
@@ -110,14 +112,14 @@ void ili9481SetWindow(int32_t x, int32_t y, int32_t w, int32_t h)
 
   buf[0] = x >> 8;
   buf[1] = x >> 0;
-  buf[2] = ((w-1) >> 8) & 0xFF;
-  buf[3] = ((w-1) >> 0) & 0xFF;
+  buf[2] = (((x+w)-1) >> 8) & 0xFF;
+  buf[3] = (((x+w)-1) >> 0) & 0xFF;
   writeParam(ILI9481_W_SET_COLUMN_ADDR, buf, 4);
 
   buf[0] = y >> 8;
   buf[1] = y >> 0;
-  buf[2] = ((h-1) >> 8) & 0xFF;
-  buf[3] = ((h-1) >> 0) & 0xFF;
+  buf[2] = (((y+h)-1) >> 8) & 0xFF;
+  buf[3] = (((y+h)-1) >> 0) & 0xFF;
   writeParam(ILI9481_W_SET_PAGE_ADDR, buf, 4);
 }
 
