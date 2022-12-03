@@ -34,7 +34,6 @@ typedef struct
 typedef struct
 {
   QueueHandle_t evt_queue_gpio;
-  QueueHandle_t evt_queue_post;
   QueueHandle_t evt_queue_send;
 } lcd_te_t;
 
@@ -60,9 +59,10 @@ static void disEngFont(int x, int y, char ch, lcd_font_t *font, uint16_t textcol
 static lcd_driver_t *p_lcd_driver = NULL;
 static SemaphoreHandle_t mutex_lock;
 
-static bool is_init = false;
-static bool is_request_draw = false;
+static bool     is_init = false;
+static bool     is_request_draw = false;
 static uint32_t is_request_index = 0;
+static bool     is_use_te = false;
 
 static lcd_frame_t lcd_frame;
 static uint8_t backlight_value = 100;
@@ -141,18 +141,9 @@ bool lcdInit(void)
 
 static void IRAM_ATTR lcdTeGpioISR(void* arg)
 {
-  xQueueSendFromISR(lcd_te.evt_queue_gpio, NULL, NULL);
-}
-
-static void lcdTeGpioThread(void* arg)
-{
-  while(1) 
+  if (is_use_te == true)
   {
-    if(xQueueReceive(lcd_te.evt_queue_gpio, NULL, portMAX_DELAY)) 
-    {
-      //delay(5);
-      xQueueSend(lcd_te.evt_queue_post, NULL, 50);
-    }
+    xQueueSendFromISR(lcd_te.evt_queue_gpio, NULL, NULL);
   }
 }
 
@@ -160,7 +151,7 @@ static void lcdTeThread(void* arg)
 {
   while(1) 
   {
-    if(xQueueReceive(lcd_te.evt_queue_post, NULL, portMAX_DELAY)) 
+    if(xQueueReceive(lcd_te.evt_queue_gpio, NULL, portMAX_DELAY)) 
     {
       if (is_request_draw == true)
       {
@@ -172,6 +163,7 @@ static void lcdTeThread(void* arg)
         lcdSwapFrameBuffer();
         is_request_draw = false;
 
+        draw_pre_time = millis();
         p_lcd_driver->setWindow(0, 0, LCD_WIDTH, LCD_HEIGHT);
         p_lcd_driver->sendBuffer(p_frame_buffer, LCD_WIDTH * LCD_HEIGHT * 2, 0);
         if (xQueueReceive(lcd_te.evt_queue_send, NULL, 100) != pdPASS)
@@ -200,9 +192,7 @@ void lcdInitTE(void)
 
   lcd_te.evt_queue_send = xQueueCreate(3, 0);
   lcd_te.evt_queue_gpio = xQueueCreate(3, 0);
-  lcd_te.evt_queue_post = xQueueCreate(3, 0);
 
-  xTaskCreate(lcdTeGpioThread, "lcdTeGpioThread", _HW_DEF_RTOS_THREAD_MEM_TE, NULL, _HW_DEF_RTOS_THREAD_PRI_TE, NULL);  
   xTaskCreate(lcdTeThread, "lcdTeGpioThread", _HW_DEF_RTOS_THREAD_MEM_TE, NULL, _HW_DEF_RTOS_THREAD_PRI_TE, NULL);
 
   io_conf.intr_type     = GPIO_INTR_POSEDGE;
@@ -290,6 +280,10 @@ bool lcdRequestDraw(void)
   lcd_frame.is_done[lcd_frame.index] = false;
   is_request_draw = true;
 
+  if (is_use_te == false)
+  {
+    xQueueSend(lcd_te.evt_queue_gpio, NULL, 10);
+  }
   return true;
 }
 
@@ -366,9 +360,17 @@ bool lcdIsInit(void)
   return is_init;
 }
 
-LCD_OPT_DEF uint32_t lcdReadPixel(uint16_t x_pos, uint16_t y_pos)
+LCD_OPT_DEF inline int32_t IRAM_ATTR lcdGetPixelIndex(int32_t x_pos, int32_t y_pos)
 {
-  return lcd_frame.draw_buffer[y_pos * LCD_WIDTH + x_pos];
+  int32_t ret;
+  //ret = y_pos * LCD_WIDTH + x_pos;
+  ret = x_pos * LCD_HEIGHT + y_pos;
+  return ret;
+}
+
+LCD_OPT_DEF inline uint32_t lcdReadPixel(uint16_t x_pos, uint16_t y_pos)
+{
+  return lcd_frame.draw_buffer[lcdGetPixelIndex(x_pos, y_pos)];
 }
 
 LCD_OPT_DEF inline void IRAM_ATTR lcdDrawPixel(int16_t x_pos, int16_t y_pos, uint32_t rgb_code)
@@ -376,7 +378,7 @@ LCD_OPT_DEF inline void IRAM_ATTR lcdDrawPixel(int16_t x_pos, int16_t y_pos, uin
   if (x_pos < 0 || x_pos >= LCD_WIDTH) return;
   if (y_pos < 0 || y_pos >= LCD_HEIGHT) return;
 
-  lcd_frame.draw_buffer[y_pos * LCD_WIDTH + x_pos] = rgb_code;
+  lcd_frame.draw_buffer[lcdGetPixelIndex(x_pos, y_pos)] = rgb_code;
 }
 
 LCD_OPT_DEF void lcdClear(uint32_t rgb_code)
@@ -988,15 +990,18 @@ LCD_OPT_DEF uint16_t lcdGetColorMix(uint16_t c1_, uint16_t c2_, uint8_t mix)
 LCD_OPT_DEF void lcdDrawPixelMix(int16_t x_pos, int16_t y_pos, uint32_t rgb_code, uint8_t mix)
 {
   uint16_t color1, color2;
+  uint32_t buf_index;
 
   if (x_pos < 0 || x_pos >= LCD_WIDTH) return;
   if (y_pos < 0 || y_pos >= LCD_HEIGHT) return;
 
   
-  color1 = lcd_frame.draw_buffer[y_pos * LCD_WIDTH + x_pos];
+  buf_index = lcdGetPixelIndex(x_pos, y_pos);
+
+  color1 = lcd_frame.draw_buffer[buf_index];
   color2 = rgb_code;
 
-  lcd_frame.draw_buffer[y_pos * LCD_WIDTH + x_pos] = lcdGetColorMix(color1, color2, 255-mix);
+  lcd_frame.draw_buffer[buf_index] = lcdGetColorMix(color1, color2, 255-mix);
 }
 
 void lcdPrintfResize(int x, int y, uint16_t color,  float ratio_h, const char *fmt, ...)
@@ -1380,7 +1385,10 @@ void cliLcd(cli_args_t *args)
  
    if (args->argc == 1 && args->isStr(0, "test") == true)
   {
-    uint8_t cnt = 0;
+    uint32_t cnt = 0;
+    uint32_t fps = 0;
+    uint32_t fps_time = 0;
+    uint32_t draw_time = 0;
 
     lcdSetFont(LCD_FONT_HAN);
 
@@ -1396,9 +1404,16 @@ void cliLcd(cli_args_t *args)
 
         lcdPrintf(25,16*0, green, "[LCD 테스트]");
 
-        lcdPrintf(0,16*1, white, "%d fps", lcdGetFps());
-        lcdPrintf(0,16*2, white, "%d ms" , lcdGetFpsTime());
-        lcdPrintf(0,16*3, white, "%u ms free" , lcdGetFpsTime() - lcdGetDrawTime());
+        if (cnt%30 == 0)
+        {
+          fps = lcdGetFps();
+          fps_time = lcdGetFpsTime();
+          draw_time = lcdGetDrawTime();
+        }
+
+        lcdPrintf(0,16*1, white, "%d fps", fps);
+        lcdPrintf(0,16*2, white, "%d ms fps" , fps_time);
+        lcdPrintf(0,16*3, white, "%u ms draw" , draw_time);
         lcdPrintfResize(LCD_WIDTH-30, 16, white, 24, "%02d", cnt%100);
         lcdPrintfResize(LCD_WIDTH-40, 40, white, 32, "%02d", cnt%100);
         cnt++;
@@ -1407,9 +1422,12 @@ void cliLcd(cli_args_t *args)
         lcdDrawFillRect(10, 70, 10, 10, green);
         lcdDrawFillRect(20, 70, 10, 10, blue);
 
-        lcdDrawFillRect(0, 120, 240, 120, green);
+        lcdDrawFillRect(((cnt*3)%(LCD_WIDTH-100)), 100, 100, (LCD_HEIGHT-100), red);
+        lcdDrawFillRect(((cnt*5)%(LCD_WIDTH-100)), 100, 100, (LCD_HEIGHT-100), green);
+        lcdDrawFillRect(((cnt*6)%(LCD_WIDTH-100)), 100, 100, (LCD_HEIGHT-100), blue);
+
         exe_time = micros()-pre_time;
-        lcdPrintf(0, 120, red, "draw %d us", exe_time);
+        lcdPrintf(0, 120, red, "draw %d ms", exe_time/1000);
 
         lcdRequestDraw();
       }

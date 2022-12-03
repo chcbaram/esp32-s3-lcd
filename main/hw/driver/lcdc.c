@@ -447,7 +447,10 @@ bool lcdcWrite(lcdc_write_t *p_write, uint32_t timeout_ms)
   lcd_ll_clear_interrupt_status(bus->hal.dev, intr_status);
 
   lcd_ll_reverse_bit_order(bus->hal.dev, false);
-  lcd_ll_swap_byte_order(bus->hal.dev, bus->bus_width, false);
+  if (bus->bus_width == 8)
+    lcd_ll_swap_byte_order(bus->hal.dev, bus->bus_width, true);
+  else
+    lcd_ll_swap_byte_order(bus->hal.dev, bus->bus_width, false);
 
   lcdcSetDmaDesc(bus->dma_nodes, p_write->p_data, p_write->data_length);
 
