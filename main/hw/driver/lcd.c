@@ -8,6 +8,7 @@
 #include "resize.h"
 #include "hangul/han.h"
 #include "lcd/lcd_fonts.h"
+#include "touch.h"
 
 
 #define lock()        xSemaphoreTake(mutex_lock, portMAX_DELAY);
@@ -1383,7 +1384,7 @@ void cliLcd(cli_args_t *args)
     ret = true;
   }
  
-   if (args->argc == 1 && args->isStr(0, "test") == true)
+  if (args->argc == 1 && args->isStr(0, "test") == true)
   {
     uint32_t cnt = 0;
     uint32_t fps = 0;
@@ -1441,6 +1442,55 @@ void cliLcd(cli_args_t *args)
     ret = true;
   }
 
+  if (args->argc == 1 && args->isStr(0, "touch") == true)
+  {
+    touch_info_t info;
+    uint32_t cnt = 0;
+    uint32_t fps = 0;
+    uint32_t fps_time = 0;
+
+    lcdSetFont(LCD_FONT_HAN);
+    while(cliKeepLoop())
+    {
+      if (lcdDrawAvailable() == true)
+      {
+        lcdClearBuffer(black);
+
+        lcdPrintf(25,16*0, green, "[TOUCH 테스트]");
+
+        if (cnt%30 == 0)
+        {
+          fps = lcdGetFps();
+          fps_time = lcdGetFpsTime();
+        }
+        cnt++;
+        lcdPrintf(5,16*1, white, "%d fps", fps);
+        lcdPrintf(5,16*2, white, "%d ms " , fps_time);
+        
+        touchGetInfo(&info);
+
+        for (int i=0; i<info.count; i++)
+        {
+          uint16_t color[2] = {red, green};
+          int16_t x;
+          int16_t y;
+
+          x = info.point[i].x;
+          y = info.point[i].y;
+
+          lcdPrintf(x, y-80, white, "%d:%d", x, y);
+          lcdDrawFillCircle(x, y, 60, color[info.point[i].id]);
+        }     
+        lcdRequestDraw();
+      }
+      delay(1);
+    }
+
+    lcdClear(black);
+
+    ret = true;
+  }
+
   if (args->argc == 2 && args->isStr(0, "bl") == true)
   {
     uint8_t bl_value;
@@ -1457,6 +1507,7 @@ void cliLcd(cli_args_t *args)
     cliPrintf("lcd info\n");
     cliPrintf("lcd draw\n");
     cliPrintf("lcd test\n");
+    cliPrintf("lcd touch\n");
     cliPrintf("lcd bl 0~100\n");
   }
 }
