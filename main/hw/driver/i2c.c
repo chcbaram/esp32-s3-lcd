@@ -204,6 +204,23 @@ bool i2cReadByte (uint8_t ch, uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_d
 bool i2cReadBytes(uint8_t ch, uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_data, uint32_t length, uint32_t timeout)
 {
   bool ret = false;
+  esp_err_t esp_ret = ESP_OK;
+
+  if (ch >= I2C_MAX_CH) return false;
+  if (i2cIsBegin(ch) == false) return false;
+
+  
+  esp_ret = i2c_master_write_read_device(i2c_tbl[ch].i2c_num, 
+                                        dev_addr, 
+                                        &reg_addr,
+                                        1,
+                                        p_data, 
+                                        length, 
+                                        timeout);
+  if (esp_ret == ESP_OK)
+  {
+    ret = true;
+  }
 
   return ret;
 }
@@ -222,8 +239,6 @@ bool i2cReadData(uint8_t ch, uint16_t dev_addr, uint8_t *p_data, uint32_t length
   {
     ret = true;
   }
-
-  return ret;
 
   return ret;
 }

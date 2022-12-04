@@ -9,7 +9,7 @@
 
 
 #include "hw.h"
-#include "lcd/ili9481.h"
+
 
 static void bootMsg(void);
 
@@ -40,11 +40,16 @@ bool hwInit(void)
 
   nvsInit();
   i2cInit();
+  i2sInit();
+  audioInit();
+  buzzerInit();
+
   sdInit();
   fatfsInit();
   lcdcInit();
   lcdInit();
   touchInit();
+  
   
   return true;
 }

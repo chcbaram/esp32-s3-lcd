@@ -28,6 +28,12 @@ extern "C" {
 #include "i2c.h"
 #include "touch.h"
 #include "lcdc.h"
+#include "mixer.h"
+#include "i2s.h"
+#include "audio.h"
+#include "buzzer.h"
+#include "lcd.h"
+#include "es8156.h"
 
 
 bool hwInit(void);

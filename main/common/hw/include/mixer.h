@@ -35,7 +35,6 @@ int8_t   mixerGetValidChannel(uint32_t length);
 
 int16_t mixerSamples(int16_t a, int16_t b);
 
-#endif
 
 #ifdef __cplusplus
 }

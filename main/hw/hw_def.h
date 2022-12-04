@@ -24,6 +24,8 @@
 #define _HW_DEF_RTOS_THREAD_PRI_SD            5
 #define _HW_DEF_RTOS_THREAD_PRI_TE            5
 #define _HW_DEF_RTOS_THREAD_PRI_FT6236        5
+#define _HW_DEF_RTOS_THREAD_PRI_I2S           5
+#define _HW_DEF_RTOS_THREAD_PRI_AUDIO         5
 
 
 #define _HW_DEF_RTOS_THREAD_MEM_CLI           (4*1024)
@@ -31,6 +33,8 @@
 #define _HW_DEF_RTOS_THREAD_MEM_SD            (4*1024)
 #define _HW_DEF_RTOS_THREAD_MEM_TE            (2*1024)
 #define _HW_DEF_RTOS_THREAD_MEM_FT6236        (2*1024)
+#define _HW_DEF_RTOS_THREAD_MEM_I2S           (4*1024)
+#define _HW_DEF_RTOS_THREAD_MEM_AUDIO         (4*1024)
 
 
 #define _USE_HW_RTOS
@@ -40,6 +44,9 @@
 #define _USE_HW_CDC
 #define _USE_HW_FT6236
 #define _USE_HW_LCDC
+#define _USE_HW_ES8156
+#define _USE_HW_I2S
+#define _USE_HW_BUZZER
 
 
 #define _USE_HW_UART
@@ -79,6 +86,13 @@
 #define _USE_HW_LCD
 #define      HW_LCD_WIDTH           HW_ILI9481_WIDTH
 #define      HW_LCD_HEIGHT          HW_ILI9481_HEIGHT
+
+#define _USE_HW_MIXER
+#define      HW_MIXER_MAX_CH        8
+#define      HW_MIXER_MAX_BUF_LEN   (16*4*8)
+
+#define _USE_HW_AUDIO
+#define      HW_AUDIO_CMD_MAX_CH    4
 
 
 
