@@ -1428,7 +1428,7 @@ void cliLcd(cli_args_t *args)
         lcdDrawFillRect(((cnt*6)%(LCD_WIDTH-100)), 100, 100, (LCD_HEIGHT-100), blue);
 
         exe_time = micros()-pre_time;
-        lcdPrintf(0, 120, red, "draw %d ms", exe_time/1000);
+        lcdPrintf(0, 120, white, "draw %d ms", exe_time/1000);
 
         lcdRequestDraw();
       }

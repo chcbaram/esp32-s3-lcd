@@ -23,8 +23,13 @@ static uint16_t ili9481GetHeight(void);
 
 
 static bool    is_init = false;
-static uint8_t data_bus_width = 16;
-
+#if 1
+static uint8_t data_bus_width = 8;  // 8bit
+static uint8_t data_bus_freq  = 20; // 20Mhz
+#else
+static uint8_t data_bus_width = 16; // 16bit
+static uint8_t data_bus_freq  = 10; // 10Mhz
+#endif
 
 
 
@@ -37,7 +42,7 @@ bool ili9481Init(void)
   logPrintf("[__] ili9481Init() {\n");
 
 
-  ret = lcdcBegin(ILI9481_WIDTH, ILI9481_HEIGHT, data_bus_width, 10); // 8/16bit, 10Mhz
+  ret = lcdcBegin(ILI9481_WIDTH, ILI9481_HEIGHT, data_bus_width, data_bus_freq); // 8/16bit, Freq Mhz
   logPrintf("[%s] lcdcBegin()\n", ret ? "OK":"NG");
   if (ret == false)
   {
