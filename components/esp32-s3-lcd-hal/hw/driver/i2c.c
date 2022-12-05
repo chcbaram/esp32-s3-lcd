@@ -212,7 +212,7 @@ bool i2cReadBytes(uint8_t ch, uint16_t dev_addr, uint16_t reg_addr, uint8_t *p_d
   
   esp_ret = i2c_master_write_read_device(i2c_tbl[ch].i2c_num, 
                                         dev_addr, 
-                                        &reg_addr,
+                                        (const uint8_t *)&reg_addr,
                                         1,
                                         p_data, 
                                         length, 
