@@ -63,7 +63,12 @@ static SemaphoreHandle_t mutex_lock;
 static bool     is_init = false;
 static bool     is_request_draw = false;
 static uint32_t is_request_index = 0;
+
+#ifdef CONFIG_S3_LCD_USE_TE
+static bool     is_use_te = true;
+#else
 static bool     is_use_te = false;
+#endif
 
 static lcd_frame_t lcd_frame;
 static uint8_t backlight_value = 100;
@@ -130,6 +135,7 @@ bool lcdInit(void)
   lcdInitTE();
 
   lcdUpdateDraw();
+  logPrintf("[__] use_te : %s\n", is_use_te ? "true":"false");
   logPrintf("[%s] lcdInit()\n", is_init ? "OK":"NG");
 
 

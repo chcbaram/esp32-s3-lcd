@@ -1682,6 +1682,14 @@ CONFIG_WPA_MBEDTLS_TLS_CLIENT=y
 # CONFIG_WPA_11R_SUPPORT is not set
 # CONFIG_WPA_WPS_SOFTAP_REGISTRAR is not set
 # end of Supplicant
+
+#
+# LCD-SETUP
+#
+CONFIG_S3_LCD_DATA_WIDTH=8
+CONFIG_S3_LCD_DATA_FREQ_MHZ=20
+# CONFIG_S3_LCD_USE_TE is not set
+# end of LCD-SETUP
 # end of Component config
 
 # Deprecated options for backward compatibility

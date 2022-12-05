@@ -23,13 +23,9 @@ static uint16_t ili9481GetHeight(void);
 
 
 static bool    is_init = false;
-#if 1
-static uint8_t data_bus_width = 8;  // 8bit
-static uint8_t data_bus_freq  = 20; // 20Mhz
-#else
-static uint8_t data_bus_width = 16; // 16bit
-static uint8_t data_bus_freq  = 10; // 10Mhz
-#endif
+static uint8_t data_bus_width = CONFIG_S3_LCD_DATA_WIDTH;    // Bit
+static uint8_t data_bus_freq  = CONFIG_S3_LCD_DATA_FREQ_MHZ; // Mhz
+
 
 
 
@@ -41,9 +37,8 @@ bool ili9481Init(void)
 
   logPrintf("[__] ili9481Init() {\n");
 
-
   ret = lcdcBegin(ILI9481_WIDTH, ILI9481_HEIGHT, data_bus_width, data_bus_freq); // 8/16bit, Freq Mhz
-  logPrintf("[%s] lcdcBegin()\n", ret ? "OK":"NG");
+  logPrintf("[%s] lcdcBegin(%dbit, %dMhz)\n", ret ? "OK":"NG", CONFIG_S3_LCD_DATA_WIDTH,CONFIG_S3_LCD_DATA_FREQ_MHZ );
   if (ret == false)
   {
     return false;
