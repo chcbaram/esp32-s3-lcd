@@ -47,6 +47,7 @@
 #define _USE_HW_ES8156
 #define _USE_HW_I2S
 #define _USE_HW_BUZZER
+#define _USE_HW_LVGL
 
 
 #define _USE_HW_UART
@@ -84,6 +85,7 @@
 #define      HW_ILI9481_HEIGHT      320
 
 #define _USE_HW_LCD
+#define      HW_LCD_LVGL
 #define      HW_LCD_WIDTH           HW_ILI9481_WIDTH
 #define      HW_LCD_HEIGHT          HW_ILI9481_HEIGHT
 

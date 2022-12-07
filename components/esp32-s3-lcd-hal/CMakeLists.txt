@@ -5,10 +5,12 @@ file(GLOB SRC_FILES
   hw/driver/lcd/*.c
   hw/driver/touch/*.c  
   hw/driver/hangul/*.c
+  hw/driver/lvgl/*.c
 )
 
 file(GLOB_RECURSE SRC_FILES_RECURSE
   common/*.c 
+  lib/lvgl/*.c
 )
 
 

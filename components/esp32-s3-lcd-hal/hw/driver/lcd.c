@@ -336,7 +336,7 @@ uint16_t *lcdGetFrameBuffer(void)
 
 uint16_t *lcdGetCurrentFrameBuffer(void)
 {
-  return (uint16_t *)lcd_frame.buffer[lcd_frame.index];
+  return (uint16_t *)lcd_frame.buffer[lcd_frame.index^1];
 }
 
 LCD_OPT_DEF void lcdClearBuffer(uint32_t rgb_code)
@@ -1316,6 +1316,7 @@ LCD_OPT_DEF void IRAM_ATTR lcdDrawImage(image_t *p_img, int16_t draw_x, int16_t 
   }  
 }
 
+#ifdef HW_LCD_LOGO
 void lcdLogoOn(void)
 {
   image_t logo;
@@ -1349,6 +1350,8 @@ bool lcdLogoIsOn(void)
 {
   return is_logo_on;
 }
+#endif
+
 #endif
 
 void cliLcd(cli_args_t *args)

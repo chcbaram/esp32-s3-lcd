@@ -20,6 +20,7 @@ extern "C" {
 
 
 bool ili9481Init(void);
+bool ili9481SetRotate(bool enable);
 
 lcd_driver_t *ili9481GetDriver(void);
 

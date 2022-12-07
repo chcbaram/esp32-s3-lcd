@@ -25,7 +25,7 @@ static uint16_t ili9481GetHeight(void);
 static bool    is_init = false;
 static uint8_t data_bus_width = CONFIG_S3_LCD_DATA_WIDTH;    // Bit
 static uint8_t data_bus_freq  = CONFIG_S3_LCD_DATA_FREQ_MHZ; // Mhz
-
+static bool    is_rotate = false;
 
 
 
@@ -100,6 +100,23 @@ bool ili9481InitRegs(void)
   return true;
 }
 
+bool ili9481SetRotate(bool enable)
+{
+  is_rotate = enable;
+
+
+  if (enable == true)
+  {
+    writeParam(ILI9481_W_SET_ADDR_MODE,    (uint8_t[]){0x28}, 1);
+  }
+  else
+  {
+    writeParam(ILI9481_W_SET_ADDR_MODE,    (uint8_t[]){0x08}, 1);
+  }
+
+  return true;
+}
+
 bool ili9481SetCallBack(void (*p_func)(void))
 {
   lcdcSetCallBack(p_func);
@@ -114,15 +131,19 @@ void ili9481SetWindow(int32_t x, int32_t y, int32_t w, int32_t h)
   buf[1] = x >> 0;
   buf[2] = (((x+w)-1) >> 8) & 0xFF;
   buf[3] = (((x+w)-1) >> 0) & 0xFF;
-  //writeParam(ILI9481_W_SET_COLUMN_ADDR, buf, 4);
-  writeParam(ILI9481_W_SET_PAGE_ADDR, buf, 4);
+  if (is_rotate == true)
+    writeParam(ILI9481_W_SET_COLUMN_ADDR, buf, 4);
+  else
+    writeParam(ILI9481_W_SET_PAGE_ADDR, buf, 4);
 
   buf[0] = y >> 8;
   buf[1] = y >> 0;
   buf[2] = (((y+h)-1) >> 8) & 0xFF;
   buf[3] = (((y+h)-1) >> 0) & 0xFF;
-  //writeParam(ILI9481_W_SET_PAGE_ADDR, buf, 4);
-  writeParam(ILI9481_W_SET_COLUMN_ADDR, buf, 4);
+  if (is_rotate == true)
+    writeParam(ILI9481_W_SET_PAGE_ADDR, buf, 4);
+  else
+    writeParam(ILI9481_W_SET_COLUMN_ADDR, buf, 4);
 }
 
 uint16_t ili9481GetWidth(void)

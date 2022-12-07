@@ -34,6 +34,7 @@ extern "C" {
 #include "buzzer.h"
 #include "lcd.h"
 #include "es8156.h"
+#include "lvgl.h"
 
 
 bool hwInit(void);
