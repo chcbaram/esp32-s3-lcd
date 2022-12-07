@@ -85,7 +85,8 @@
 #define      HW_ILI9481_HEIGHT      320
 
 #define _USE_HW_LCD
-#define      HW_LCD_LVGL
+#define      HW_LCD_LVGL            1
+#define      HW_LCD_LOGO            1
 #define      HW_LCD_WIDTH           HW_ILI9481_WIDTH
 #define      HW_LCD_HEIGHT          HW_ILI9481_HEIGHT
 

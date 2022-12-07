@@ -89,8 +89,10 @@ static lcd_font_t *font_tbl[LCD_FONT_MAX] = { &font_07x10, &font_11x18, &font_16
 
 static LcdResizeMode lcd_resize_mode = LCD_RESIZE_NEAREST;
 
-
-
+#if HW_LCD_LOGO > 0
+LVGL_IMG_DEF(logo_img);
+static bool is_logo_on = false;
+#endif
 
 
 bool lcdInit(void)
@@ -138,6 +140,9 @@ bool lcdInit(void)
   logPrintf("[__] use_te : %s\n", is_use_te ? "true":"false");
   logPrintf("[%s] lcdInit()\n", is_init ? "OK":"NG");
 
+  #if HW_LCD_LOGO > 0
+  lcdLogoOn();
+  #endif
 
   lcdLoadCfg();
   lcdSetBackLight(backlight_value);
@@ -1316,7 +1321,7 @@ LCD_OPT_DEF void IRAM_ATTR lcdDrawImage(image_t *p_img, int16_t draw_x, int16_t 
   }  
 }
 
-#ifdef HW_LCD_LOGO
+#if HW_LCD_LOGO > 0
 void lcdLogoOn(void)
 {
   image_t logo;
@@ -1330,8 +1335,8 @@ void lcdLogoOn(void)
   lcdClearBuffer(black);
   lcdDrawImage(&logo, x, y - 16);
 
-  lcdDrawRect(0, 0, LCD_WIDTH-0, LCD_HEIGHT-0, white);
-  lcdDrawRect(1, 1, LCD_WIDTH-2, LCD_HEIGHT-2, white);
+  //lcdDrawRect(0, 0, LCD_WIDTH-0, LCD_HEIGHT-0, white);
+  //lcdDrawRect(1, 1, LCD_WIDTH-2, LCD_HEIGHT-2, white);
 
   lcdUpdateDraw();
 
