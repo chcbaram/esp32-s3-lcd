@@ -67,7 +67,7 @@ bool es8156InitRegs(void)
   bool ret = true;
 
 
-  ret &= writeReg(ES8156_DAC_SDP_REG11,        0x04);
+  ret &= writeReg(ES8156_DAC_SDP_REG11,        0x31);
   ret &= writeReg(ES8156_VOLUME_CONTROL_REG14, 100);
   
   #if 0
