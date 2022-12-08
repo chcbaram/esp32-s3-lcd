@@ -9,8 +9,7 @@
 
 
 #include "ap.h"
-
-
+#include "module/audio_play.h"
 
 
 
@@ -36,6 +35,9 @@ void apInit(void)
 void apMain(void)
 {
   uint32_t pre_time;
+
+
+  audioPlayInit();
 
 
   pre_time = millis();

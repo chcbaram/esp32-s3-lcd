@@ -26,6 +26,7 @@ typedef struct
   bool    is_open;
   uint8_t ch;
   const char *p_file_name;
+  void (*p_func)(void *p_data, uint32_t length);
 
   int8_t   octave;
   int8_t   note;
@@ -47,7 +48,7 @@ bool audioIsPlaying(audio_t *p_audio);
 
 uint32_t audioAvailableForWrite(audio_t *p_audio);
 bool     audioWrite(audio_t *p_audio, int16_t *p_wav_data, uint32_t wav_len);
-
+bool     audioSetWriteCallBack(audio_t *p_audio, void (*p_func)(void *p_data, uint32_t frame_len));
 bool audioPlayBeep(uint32_t freq, uint8_t volume, uint32_t time_ms);
 
 bool audioPlayNote(int8_t octave, int8_t note, uint32_t time_ms);

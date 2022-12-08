@@ -34,7 +34,7 @@
 #define _HW_DEF_RTOS_THREAD_MEM_TE            (2*1024)
 #define _HW_DEF_RTOS_THREAD_MEM_FT6236        (2*1024)
 #define _HW_DEF_RTOS_THREAD_MEM_I2S           (4*1024)
-#define _HW_DEF_RTOS_THREAD_MEM_AUDIO         (4*1024)
+#define _HW_DEF_RTOS_THREAD_MEM_AUDIO         (8*1024)
 
 
 #define _USE_HW_RTOS

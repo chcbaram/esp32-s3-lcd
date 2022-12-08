@@ -182,6 +182,7 @@ bool audioOpen(audio_t *p_audio)
   if (ch >= 0)
   {
     p_audio->ch = ch;
+    p_audio->p_func = NULL;
     p_audio->is_open = true;
     audio_cmd[ch].is_used = true;
     ret = true;
@@ -197,11 +198,18 @@ bool audioClose(audio_t *p_audio)
   if (p_audio->is_open == true)
   {
     audioStopFile(p_audio);
+    p_audio->p_func = NULL;
     p_audio->is_open = false;
     audio_cmd[p_audio->ch].is_used = false;
   }
 
   return ret;
+}
+
+bool audioSetWriteCallBack(audio_t *p_audio, void (*p_func)(void *p_data, uint32_t frame_len))
+{
+  p_audio->p_func = p_func;
+  return true;
 }
 
 void audioSetNoteVolume(uint8_t volume)
@@ -458,6 +466,10 @@ void audioProcessPlayFile(audio_cmd_t *p_cmd)
           break;
         }
         i2sWrite(ch, (int16_t *)buf_frame, r_len);
+        if (p_cmd->audio->p_func != NULL)
+        {
+          p_cmd->audio->p_func(buf_frame, r_len);
+        }
       }
       delay(1);
     }
