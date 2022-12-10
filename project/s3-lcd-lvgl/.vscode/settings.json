@@ -8,6 +8,7 @@
     "es8156.h": "c",
     "def.h": "c",
     "lv_demo_benchmark.h": "c",
-    "lv_demo_music.h": "c"
+    "lv_demo_music.h": "c",
+    "lv_color.h": "c"
   }
 }

@@ -10,9 +10,11 @@
 
 #include "ap.h"
 #include "lvgl/lvgl_main.h"
+#include "module/audio_play.h"
 
 
 static void cliThread(void *args);
+static void mainThread(void *args);
 static uint8_t getDemoMode(void);
 
 
@@ -20,6 +22,7 @@ static uint8_t getDemoMode(void);
 void apInit(void)
 {
   cliOpen(_DEF_UART1, 115200);
+  audioPlayInit();
 
 
   if (xTaskCreate(cliThread, "cliThread", _HW_DEF_RTOS_THREAD_MEM_CLI, NULL, _HW_DEF_RTOS_THREAD_PRI_CLI, NULL) != pdPASS)
@@ -27,11 +30,31 @@ void apInit(void)
     logPrintf("[NG] cliThread()\n");   
   }  
 
+  if (xTaskCreate(mainThread, "mainThread", 8*1024, NULL, 5, NULL) != pdPASS)
+  {
+    logPrintf("[NG] mainThread()\n");   
+  }  
+  
   delay(500);
   logBoot(false);
 }
 
 void apMain(void)
+{
+  uint32_t pre_time;
+
+  pre_time = millis();
+  while(1)
+  {
+    if (millis()-pre_time >= 500)
+    {
+      pre_time = millis();
+    }
+    delay(1);   
+  }
+}
+
+void mainThread(void *args)
 {
   uint32_t pre_time;
 
@@ -42,7 +65,7 @@ void apMain(void)
 
     if (touchGetInfo(&info))
     {
-      if (info.count >= 2)
+      if (info.count > 0)
       {
         break;
       }
@@ -51,7 +74,7 @@ void apMain(void)
   }
 
   lcdClear(black);
-  
+
   lvglInit();
   lvglMainInit();
 

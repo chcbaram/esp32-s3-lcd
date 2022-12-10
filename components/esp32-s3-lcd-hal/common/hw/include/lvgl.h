@@ -13,6 +13,12 @@
 
 bool lvglInit(void);
 bool lvglUpdate(void);
+bool lvglSuspend(void);
+bool lvglResume(void);
+
+void *lvglMalloc(size_t size);
+void *lvglRealloc(void * p, size_t new_size);
+void lvglFree(void * p);
 
 #endif
 

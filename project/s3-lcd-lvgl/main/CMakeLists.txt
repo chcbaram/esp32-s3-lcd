@@ -8,7 +8,10 @@ file(GLOB_RECURSE SRC_FILES_RECURSE
   ap/*.cpp
 )
 
-set(requires "esp32-s3-lcd-hal")
+set(requires 
+  "esp32-s3-lcd-hal"
+  "esp-dsp"
+)
 
 idf_component_register(
   SRCS "main.cpp"

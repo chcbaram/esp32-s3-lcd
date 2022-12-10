@@ -425,7 +425,8 @@ bool audioPlayBeep(uint32_t freq, uint8_t volume, uint32_t time_ms)
   {
     if (audio_cmd[ch].is_busy)
     {
-      audioStopFile(p_audio);
+      //audioStopFile(p_audio);
+      return true;
     }
 
     audio_cmd_t *p_cmd;

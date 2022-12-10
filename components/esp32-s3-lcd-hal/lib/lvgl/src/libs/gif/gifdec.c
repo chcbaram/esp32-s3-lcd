@@ -8,8 +8,10 @@
 #include <string.h>
 #include <stdbool.h>
 
+#ifndef MAX
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #define MAX(A, B) ((A) > (B) ? (A) : (B))
+#endif
 
 typedef struct Entry {
     uint16_t length;

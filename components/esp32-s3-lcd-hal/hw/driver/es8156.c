@@ -142,7 +142,9 @@ bool es8156SetVolume(uint8_t volume)
 
   main_volume = constrain(volume, 0, 100); 
 
-  uint8_t d = 0xBF - 60 + 6 * main_volume / 10;
+  uint8_t d;
+  
+  d = cmap(main_volume, 0, 100, 0, 255);
   if (0 == main_volume) 
   {
     d = 0;

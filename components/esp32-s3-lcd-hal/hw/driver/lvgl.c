@@ -34,6 +34,18 @@ bool lvglDeInit(void)
   return true;
 }
 
+bool lvglSuspend(void)
+{
+  ili9481SetRotate(false);
+  return true;
+}
+
+bool lvglResume(void)
+{
+  ili9481SetRotate(true);  
+  return true;
+}
+
 bool lvglUpdate(void)
 {
   if (is_init == false)
@@ -41,6 +53,29 @@ bool lvglUpdate(void)
 
   lv_task_handler();
   return true;
+}
+
+void *lvglMalloc(size_t size)
+{
+  void *ret;
+
+  ret = heap_caps_malloc(size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+
+  return ret;
+}
+
+void *lvglRealloc(void * p, size_t new_size)
+{
+  void *ret;
+
+  ret = heap_caps_realloc(p, new_size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+
+  return ret;
+}
+
+void lvglFree(void * p)
+{
+  heap_caps_free(p);
 }
 
 #endif
