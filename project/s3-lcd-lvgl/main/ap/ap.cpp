@@ -9,10 +9,7 @@
 
 
 #include "ap.h"
-#include "benchmark/lv_demo_benchmark.h"
-#include "stress/lv_demo_stress.h"
-#include "music/lv_demo_music.h"
-#include "widgets/lv_demo_widgets.h"
+#include "lvgl/lvgl_main.h"
 
 
 static void cliThread(void *args);
@@ -38,34 +35,27 @@ void apMain(void)
 {
   uint32_t pre_time;
 
-  lcdClear(black);
 
-  lvglInit();
-
-  switch(getDemoMode())
+  while(1)
   {
-    case 0:
-      lv_demo_benchmark(LV_DEMO_BENCHMARK_MODE_RENDER_AND_DRIVER);
-      break;
+    touch_info_t info;
 
-    case 1:
-      lv_demo_stress();
-      break;
-
-    case 2:
-      lv_demo_music();
-      break;
-
-    case 3:
-      lv_demo_widgets();
-      break;
-
-    default:
-      lv_demo_benchmark(LV_DEMO_BENCHMARK_MODE_RENDER_AND_DRIVER);
-      break;
+    if (touchGetInfo(&info))
+    {
+      if (info.count >= 2)
+      {
+        break;
+      }
+    }
+    delay(1);
   }
 
-  logPrintf("lv_demo_benchmark() begin\n");
+  lcdClear(black);
+  
+  lvglInit();
+  lvglMainInit();
+
+  logPrintf("lvglMain() begin\n");
   pre_time = millis();
   while(1)
   {
