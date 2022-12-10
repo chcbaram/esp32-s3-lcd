@@ -65,11 +65,45 @@ bool es8156Init(void)
 bool es8156InitRegs(void)
 {
   bool ret = true;
+  uint8_t reg;
+
+  delay(200);
+
+  ret &= writeReg(ES8156_RESET_REG00, 0x1C);
+  delay(10);
+  ret &= writeReg(ES8156_RESET_REG00, 0x03);
 
 
   ret &= writeReg(ES8156_DAC_SDP_REG11,        0x31);
   ret &= writeReg(ES8156_VOLUME_CONTROL_REG14, 100);
-  
+
+  reg  = 0;
+  reg |= (1 << 3); // 0 – lineout
+                   // 1 – enable HP driver for headphone output
+  reg |= (1 << 1); // 0 - SWRMPSEL disable
+                   // 1 - SWRMPSEL enable
+  reg |= (0 << 0); // 0 - OUT_MUTE normal
+                   // 1 - OUT_MUTE mote_output
+  ret &= writeReg(ES8156_ANALOG_SYS3_REG22,    reg);
+
+  reg  = 0;
+  reg |= (0 << 7); // 0 - enable analog circuits
+  reg |= (1 << 6); // 0 - disable reference circuits for output
+                   // 1 - enable reference circuits for DAC output
+  reg |= (2 << 4); // 0 - VMID power down
+                   // 1 - VMID speed charge1
+                   // 2 - normal VMID operation
+                   // 3 - VMID speed charge3
+  reg |= (1 << 3); // 0 – disable HPCOM
+                   // 1 - enable HPCOM
+  reg |= (0 << 2); // 0 – enable analog DAC reference circuits                   
+                   // 1 – power down analog DAC reference circuits
+  reg |= (1 << 1); // 0 – disable internal reference circuits
+                   // 1 – enable reference circuits
+  reg |= (0 << 0); // 0 – enable DAC              
+                   // 1 - power down DAC
+  ret &= writeReg(ES8156_ANALOG_SYS5_REG25,    reg);
+
   #if 0
   /* set clock and analog power */
   ret &= writeReg(ES8156_SCLK_MODE_REG02,     0x04);

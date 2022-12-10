@@ -45,6 +45,8 @@ bool audioClose(audio_t *p_audio);
 bool audioPlayFile(audio_t *p_audio, const char *p_name, bool wait);
 bool audioStopFile(audio_t *p_audio);
 bool audioIsPlaying(audio_t *p_audio);
+bool audioSetVolume(uint8_t volume);
+uint8_t audioGetVolume(void);
 
 uint32_t audioAvailableForWrite(audio_t *p_audio);
 bool     audioWrite(audio_t *p_audio, int16_t *p_wav_data, uint32_t wav_len);

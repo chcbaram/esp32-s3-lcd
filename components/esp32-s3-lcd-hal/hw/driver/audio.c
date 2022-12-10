@@ -212,6 +212,24 @@ bool audioSetWriteCallBack(audio_t *p_audio, void (*p_func)(void *p_data, uint32
   return true;
 }
 
+bool audioSetVolume(uint8_t volume)
+{
+  bool ret;
+
+  ret = es8156SetVolume(volume);
+
+  return ret;
+}
+
+uint8_t audioGetVolume(void)
+{
+  uint8_t ret;
+
+  ret = es8156GetVolume();
+
+  return ret;
+}
+
 void audioSetNoteVolume(uint8_t volume)
 {
   note_volume = constrain(volume, 0, 100);
@@ -507,6 +525,25 @@ void cliAudio(cli_args_t *args)
 
   if (args->argc == 1 && args->isStr(0, "info") == true)
   {
+    cliPrintf("volume main : %d%%\n", audioGetVolume());
+    cliPrintf("volume note : %d%%\n", audioGetNoteVolume());
+    ret = true;
+  }
+
+  if (args->argc >= 1 && args->isStr(0, "volume") == true)
+  {
+    if (args->argc == 0)
+    {
+      cliPrintf("volume main : %d%%\n", audioGetVolume());
+    }
+    else
+    {
+      uint8_t volume;
+
+      volume = args->getData(1);
+      cliPrintf("set volume : %d %%\n", volume);
+      audioSetVolume(volume);
+    }
     ret = true;
   }
 
@@ -559,6 +596,7 @@ void cliAudio(cli_args_t *args)
   if (ret != true)
   {
     cliPrintf("audio info\n");
+    cliPrintf("audio volume [0~100]\n");
     cliPrintf("audio beep freq time_ms\n");
     cliPrintf("audio file filename\n");
   }
