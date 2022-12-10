@@ -4,25 +4,30 @@
 
 static void file_explorer_event_handler(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t * obj = lv_event_get_target(e);
 
-    if(code == LV_EVENT_VALUE_CHANGED) {
-        const char * cur_path =  lv_file_explorer_get_current_path(obj);
-        const char * sel_fn = lv_file_explorer_get_selected_file_name(obj);
-        uint16_t path_len = strlen(cur_path);
-        uint16_t fn_len = strlen(sel_fn);
+  if(code == LV_EVENT_VALUE_CHANGED) 
+  {
+    const char * cur_path =  lv_file_explorer_get_current_path(obj);
+    const char * sel_fn = lv_file_explorer_get_selected_file_name(obj);
+    uint16_t path_len = strlen(cur_path);
+    uint16_t fn_len = strlen(sel_fn);
 
-        if((path_len + fn_len) <= LV_FILE_EXPLORER_PATH_MAX_LEN) {
-            char file_info[LV_FILE_EXPLORER_PATH_MAX_LEN];
+    if((path_len + fn_len) <= LV_FILE_EXPLORER_PATH_MAX_LEN) 
+    {
+      char file_info[LV_FILE_EXPLORER_PATH_MAX_LEN];
 
-            strcpy(file_info, cur_path);
-            strcat(file_info, sel_fn);
+      strcpy(file_info, cur_path);
+      strcat(file_info, sel_fn);
 
-            LV_LOG_USER("%s", file_info);
-        }
-        else    LV_LOG_USER("%s%s", cur_path, sel_fn);
+      LV_LOG_USER("%s", file_info);
+      lvglSuspend();
+      audioPlayFile(sel_fn);
+      lvglResume();      
     }
+    else    LV_LOG_USER("%s%s", cur_path, sel_fn);
+  }
 }
 
 
@@ -60,19 +65,30 @@ static void event_handler(lv_event_t * e)
 
 void lvglMainInit(void)
 {
-    // lv_obj_t * file_explorer = lv_file_explorer_create(lv_scr_act());
-    // lv_file_explorer_set_sort(file_explorer, LV_EXPLORER_SORT_KIND);
+
+  /*Create a Tab view object*/
+  lv_obj_t * tabview;
+  tabview = lv_tabview_create(lv_scr_act(), LV_DIR_TOP, 5);
+
+  /*Add 3 tabs (the tabs are page (lv_page) and can be scrolled*/
+  lv_obj_t * tab1 = lv_tabview_add_tab(tabview, " ");
+  lv_obj_t * tab2 = lv_tabview_add_tab(tabview, " ");
+  lv_obj_t * tab3 = lv_tabview_add_tab(tabview, " ");
+
+  lv_obj_t * file_explorer = lv_file_explorer_create(tab2);
+  lv_file_explorer_set_sort(file_explorer, LV_EXPLORER_SORT_KIND);
+
+  // explorer
+  //
+  lv_file_explorer_open_dir(file_explorer, "0:");
+  lv_obj_add_event_cb(file_explorer, file_explorer_event_handler, LV_EVENT_ALL, NULL);
 
 
-    // lv_file_explorer_open_dir(file_explorer, "0:");
-    // lv_obj_add_event_cb(file_explorer, file_explorer_event_handler, LV_EVENT_ALL, NULL);
-    // return;
-
-
-
+  // buttons
+  //
   lv_obj_t * label;
 
-  lv_obj_t * btn1 = lv_btn_create(lv_scr_act());
+  lv_obj_t * btn1 = lv_btn_create(tab1);
   lv_obj_add_event_cb(btn1, event_handler, LV_EVENT_ALL, (void *)0);
   lv_obj_align(btn1, LV_ALIGN_CENTER, -120, 0);
   lv_obj_set_width(btn1, 100);
@@ -82,7 +98,7 @@ void lvglMainInit(void)
   lv_label_set_text(label, "Play #1");
   lv_obj_center(label);
 
-  lv_obj_t * btn2 = lv_btn_create(lv_scr_act());
+  lv_obj_t * btn2 = lv_btn_create(tab1);
   lv_obj_add_event_cb(btn2, event_handler, LV_EVENT_ALL, (void *)1);
   lv_obj_align(btn2, LV_ALIGN_CENTER, 0, 0);
   lv_obj_set_width(btn2, 100);
@@ -92,7 +108,7 @@ void lvglMainInit(void)
   lv_label_set_text(label, "Play #2");
   lv_obj_center(label);
 
-  lv_obj_t * btn3 = lv_btn_create(lv_scr_act());
+  lv_obj_t * btn3 = lv_btn_create(tab1);
   lv_obj_add_event_cb(btn3, event_handler, LV_EVENT_ALL, (void *)2);
   lv_obj_align(btn3, LV_ALIGN_CENTER, 120, 0);
   lv_obj_set_width(btn3, 100);

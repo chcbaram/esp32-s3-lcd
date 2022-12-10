@@ -42,7 +42,8 @@ bool lvglSuspend(void)
 
 bool lvglResume(void)
 {
-  ili9481SetRotate(true);  
+  ili9481SetRotate(true); 
+  lv_port_disp_init(); 
   return true;
 }
 

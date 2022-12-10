@@ -3,6 +3,7 @@
 
 
 
+static bool is_init = false;
 
 static void disp_init(void);
 static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
@@ -31,6 +32,8 @@ void lv_port_disp_init(void)
 
   lv_disp_draw_buf_init(&draw_buf_dsc, p_buf_1, p_buf_2, LCD_WIDTH * LCD_HEIGHT);  
 
+
+  if (is_init) return;
 
   /*-----------------------------------
     * Register the display in LVGL
@@ -61,6 +64,8 @@ void lv_port_disp_init(void)
 
   /*Finally register the driver*/
   lv_disp_drv_register(&disp_drv);  
+
+  is_init = true;
 }
 
 /**********************

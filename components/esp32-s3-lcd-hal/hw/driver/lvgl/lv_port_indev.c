@@ -37,6 +37,11 @@ void lv_port_indev_init(void)
 
   /*Register a touchpad input device*/
   lv_indev_drv_init(&indev_drv);
+
+
+  indev_drv.gesture_limit        = 20;
+  indev_drv.gesture_min_velocity = 2;
+
   indev_drv.type = LV_INDEV_TYPE_POINTER;
   indev_drv.read_cb = touchpad_read;
   indev_touchpad = lv_indev_drv_register(&indev_drv);

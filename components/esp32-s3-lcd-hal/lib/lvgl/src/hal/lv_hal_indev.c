@@ -92,7 +92,7 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
     indev->driver = driver;
 
     indev->proc.reset_query  = 1;
-    indev->driver->read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_DEF_REFR_PERIOD, indev);
+    indev->driver->read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_DEF_REFR_PERIOD/2, indev);
 
     return indev;
 }
