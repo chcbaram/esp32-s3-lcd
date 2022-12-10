@@ -1,0 +1,13 @@
+{
+  "files.associations": {
+    "ft6236.h": "c",
+    "hw_def.h": "c",
+    "ili9481.h": "c",
+    "mixer.h": "c",
+    "type_traits": "c",
+    "es8156.h": "c",
+    "def.h": "c",
+    "lv_demo_benchmark.h": "c",
+    "lv_demo_music.h": "c"
+  }
+}
