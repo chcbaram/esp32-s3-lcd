@@ -85,7 +85,7 @@ void ft6236Thread(void* arg)
 
     data = 10; 
     writeRegs(FT6236_REG_PERIOID_ACTIVE, &data, 1);
-    data = 80; // 감도 
+    data = 90; // 감도 
     writeRegs(FT6236_REG_TH_GROUP, &data, 1);  
 
     is_init = true;

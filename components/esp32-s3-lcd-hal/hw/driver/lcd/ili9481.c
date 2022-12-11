@@ -73,7 +73,7 @@ bool ili9481InitRegs(void)
   writeParam(ILI9481_W_SET_PIXEL_FORMAT, (uint8_t[]){0x55}, 1);
   writeParam(ILI9481_C_ENTER_INVERT_MODE, NULL, 0);
   //writeParam(ILI9481_WR_POWER_SET,       (uint8_t[]){0x07, 0x42, 0x15}, 3);
-  writeParam(ILI9481_WR_POWER_SET,       (uint8_t[]){0x07, 0x40, 0x05}, 3);
+  writeParam(ILI9481_WR_POWER_SET,       (uint8_t[]){0x00, 0x40, 0x05}, 3);
 
 
 
