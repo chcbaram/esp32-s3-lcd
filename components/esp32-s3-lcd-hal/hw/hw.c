@@ -49,7 +49,7 @@ bool hwInit(void)
   lcdcInit();
   lcdInit();
   touchInit();
-  
+  btHidhInit();
   
   return true;
 }

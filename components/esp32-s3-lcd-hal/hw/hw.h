@@ -35,6 +35,7 @@ extern "C" {
 #include "lcd.h"
 #include "es8156.h"
 #include "lvgl.h"
+#include "bt_hidh.h"
 
 
 bool hwInit(void);

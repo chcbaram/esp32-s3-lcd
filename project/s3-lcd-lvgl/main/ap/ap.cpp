@@ -15,7 +15,7 @@
 
 static void cliThread(void *args);
 static void mainThread(void *args);
-static uint8_t getDemoMode(void);
+
 
 
 
@@ -78,6 +78,9 @@ void mainThread(void *args)
   lvglInit();
   lvglMainInit();
 
+  btHidhBegin();
+  btHidhConnect();
+  
   logPrintf("lvglMain() begin\n");
   pre_time = millis();
   while(1)
@@ -90,34 +93,6 @@ void mainThread(void *args)
 
     lvglUpdate();
   }
-}
-
-uint8_t getDemoMode(void)
-{
-  uint8_t ret = 0;
-  esp_err_t err;
-  nvs_handle_t nvs_h;
-
-
-  err = nvs_open("storage", NVS_READWRITE, &nvs_h);
-  if (err == ESP_OK)
-  {
-    uint8_t mode = 0;
-
-    if (nvs_get_u8(nvs_h, "demo_mode", &mode) != ESP_ERR_NVS_NOT_FOUND)
-    {
-      ret = mode;
-    }
-
-    mode = (mode + 1) % 4;
-
-    nvs_set_u8(nvs_h, "demo_mode", mode);
-    nvs_commit(nvs_h);
-
-    nvs_close(nvs_h);
-  }
-
-  return ret;
 }
 
 void cliThread(void *args)

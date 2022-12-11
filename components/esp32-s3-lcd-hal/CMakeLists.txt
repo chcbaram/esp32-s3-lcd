@@ -6,6 +6,7 @@ file(GLOB SRC_FILES
   hw/driver/touch/*.c  
   hw/driver/hangul/*.c
   hw/driver/lvgl/*.c
+  hw/driver/bt_hid/*.c
 )
 
 file(GLOB_RECURSE SRC_FILES_RECURSE
@@ -23,6 +24,7 @@ set(requires
   "nvs_flash"
   "esp_adc"
   "app_update"
+  "esp_hid"
   )
 
 
@@ -41,6 +43,6 @@ idf_component_register(
     REQUIRES "${requires}"
     )
 
-
+    target_compile_options(${COMPONENT_LIB} PRIVATE "-Wno-format")
   
 

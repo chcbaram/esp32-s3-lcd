@@ -26,6 +26,7 @@
 #define _HW_DEF_RTOS_THREAD_PRI_FT6236        5
 #define _HW_DEF_RTOS_THREAD_PRI_I2S           5
 #define _HW_DEF_RTOS_THREAD_PRI_AUDIO         5
+#define _HW_DEF_RTOS_THREAD_PRI_BT_HIDH       5
 
 
 #define _HW_DEF_RTOS_THREAD_MEM_CLI           (4*1024)
@@ -35,7 +36,7 @@
 #define _HW_DEF_RTOS_THREAD_MEM_FT6236        (2*1024)
 #define _HW_DEF_RTOS_THREAD_MEM_I2S           (4*1024)
 #define _HW_DEF_RTOS_THREAD_MEM_AUDIO         (8*1024)
-
+#define _HW_DEF_RTOS_THREAD_MEM_BT_HIDH       (6*1024)
 
 #define _USE_HW_RTOS
 #define _USE_HW_SD
@@ -48,6 +49,7 @@
 #define _USE_HW_I2S
 #define _USE_HW_BUZZER
 #define _USE_HW_LVGL
+#define _USE_HW_BT_HIDH
 
 
 #define _USE_HW_UART

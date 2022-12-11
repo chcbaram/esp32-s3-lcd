@@ -1,9 +1,0 @@
-{
-  "files.associations": {
-    "dsps_wind_hann.h": "c",
-    "audio.h": "c",
-    "lv_conf_internal.h": "c",
-    "lv_conf_kconfig.h": "c",
-    "lvgl.h": "c"
-  }
-}

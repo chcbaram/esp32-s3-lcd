@@ -9,6 +9,8 @@
     "def.h": "c",
     "lv_demo_benchmark.h": "c",
     "lv_demo_music.h": "c",
-    "lv_color.h": "c"
+    "lv_color.h": "c",
+    "qbuffer.h": "c",
+    "lv_malloc_builtin.h": "c"
   }
 }
