@@ -28,8 +28,12 @@ bool btHidhIsBegin(void);
 bool btHidhConnect(void);
 bool btHidhIsConnect(void);
 bool btHidhDisconnect(void);
-
 void btHidhStopCmd(uint32_t timeout_ms);
+
+uint32_t btHidhMouseAvailable(void);
+bool btHidhMouseFlush(void);
+bool btHidhMouseRead(bt_hidh_mouse_info_t *p_info);
+
 
 #endif
 

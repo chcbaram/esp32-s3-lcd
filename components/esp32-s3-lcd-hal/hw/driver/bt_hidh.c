@@ -212,9 +212,8 @@ void btHidhCallback(void *handler_args, esp_event_base_t base, int32_t id, void 
 {
   esp_hidh_event_t event = (esp_hidh_event_t)id;
   esp_hidh_event_data_t *param = (esp_hidh_event_data_t *)event_data;
-  uint8_t btn;
-  int16_t x;
-  int16_t y;
+  bt_hidh_mouse_info_t mouse_info;
+
 
   switch (event) 
   {
@@ -244,15 +243,15 @@ void btHidhCallback(void *handler_args, esp_event_base_t base, int32_t id, void 
 
     case ESP_HIDH_INPUT_EVENT: 
     {        
-      btn = param->input.data[0];
-      x   = (param->input.data[3] & 0x0F) << 12;
-      x  |= (param->input.data[2] & 0xFF) <<  4;
-      x >>= 4;
-      y   = (param->input.data[4] & 0xFF) <<  8;
-      y  |= (param->input.data[3] & 0xF0) <<  0;
-      y >>= 4;
+      mouse_info.btn = param->input.data[0];
+      mouse_info.x   = (param->input.data[3] & 0x0F) << 12;
+      mouse_info.x  |= (param->input.data[2] & 0xFF) <<  4;
+      mouse_info.x >>= 4;
+      mouse_info.y   = (param->input.data[4] & 0xFF) <<  8;
+      mouse_info.y  |= (param->input.data[3] & 0xF0) <<  0;
+      mouse_info.y >>= 4;
 
-      logPrintf("btn 0x%02X, x %d y %d\n", btn, x, y);
+      qbufferWrite(&ble_mouse_info.msg_q, (uint8_t *)&mouse_info, 1);
       break;
     }
 
@@ -503,6 +502,24 @@ bool btHidhLoadDevice(ble_hid_dev_t *p_dev)
   return true;
 }
 
+uint32_t btHidhMouseAvailable(void)
+{
+  if (ble_mouse_info.is_open == false) return 0;
+
+  return qbufferAvailable(&ble_mouse_info.msg_q);
+}
+
+bool btHidhMouseFlush(void)
+{
+  qbufferFlush(&ble_mouse_info.msg_q);
+  return true;
+}
+
+bool btHidhMouseRead(bt_hidh_mouse_info_t *p_info)
+{
+  return qbufferRead(&ble_mouse_info.msg_q, (uint8_t *)p_info, 1);
+}
+
 void cliCmd(cli_args_t *args)
 {
   bool ret = false;
@@ -613,6 +630,30 @@ void cliCmd(cli_args_t *args)
     ret = true;
   }
 
+  if (args->argc == 1 && args->isStr(0, "stop"))
+  {
+    cliPrintf("Stop Cmd Begin\n");
+    btHidhStopCmd(10000);
+    cliPrintf("Stop Cmd End\n");
+    ret = true;
+  }
+
+  if (args->argc == 2 && args->isStr(0, "mouse") && args->isStr(1, "info"))
+  {
+    bt_hidh_mouse_info_t info;
+
+    while(cliKeepLoop())
+    {
+      if (btHidhMouseAvailable() > 0)
+      {
+        btHidhMouseRead(&info);
+        cliPrintf("btn : 0x%02X, x %-4d, y %-4d\n", info.btn, info.x, info.y);
+      }
+      delay(1);
+    }
+    ret = true;
+  }
+
   if (ret == false)
   {
     cliPrintf("bt_hidh info\n");
@@ -624,6 +665,7 @@ void cliCmd(cli_args_t *args)
     cliPrintf("bt_hidh connect\n");
     cliPrintf("bt_hidh disconnect\n");    
     cliPrintf("bt_hidh stop\n");
+    cliPrintf("bt_hidh mouse info\n");
   }
 }
 #else
