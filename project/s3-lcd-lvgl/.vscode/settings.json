@@ -11,6 +11,7 @@
     "lv_demo_music.h": "c",
     "lv_color.h": "c",
     "qbuffer.h": "c",
-    "lv_malloc_builtin.h": "c"
+    "lv_malloc_builtin.h": "c",
+    "bt_hidh.h": "c"
   }
 }

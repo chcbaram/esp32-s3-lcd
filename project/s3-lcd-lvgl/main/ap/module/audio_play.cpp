@@ -38,6 +38,10 @@ __attribute__((aligned(16))) float  y_cf[N_SAMPLES*2]; // working complex array
 __attribute__((aligned(16))) float* r_cf = &y_cf[0];   // Pointers to result arrays
 
 block_t block_info;
+LVGL_IMG_DEF(mouse_cursor_img);
+static image_t mouse_cursor;
+static int16_t mouse_x = LCD_WIDTH/2;
+static int16_t mouse_y = LCD_HEIGHT/2;
 
 
 
@@ -57,6 +61,8 @@ bool audioPlayInit(void)
     return false;
   }
 
+  mouse_cursor = lcdCreateImage(&mouse_cursor_img, 0, 0, 0, 0);
+
   cliAdd("audio-play", cliCmd);
   return true;
 }
@@ -72,6 +78,7 @@ bool audioPlayFile(const char *file_name)
   audio_t audio;
   uint8_t mode = 0;
   touch_info_t touch_info;
+  bt_hidh_mouse_info_t mouse_info;
 
   block_info.update_cnt = 0;
   memset(block_info.block_peak, 0, sizeof(block_info.block_peak));
@@ -119,6 +126,18 @@ bool audioPlayFile(const char *file_name)
     {
       break;
     }
+    if (btHidhMouseAvailable() > 0)
+    {
+      btHidhMouseRead(&mouse_info);
+      if (mouse_info.btn & 0x08)
+      {
+        break;
+      }
+      mouse_x += mouse_info.x;
+      mouse_y += mouse_info.y;
+      mouse_x = constrain(mouse_x, 0, LCD_WIDTH-3);
+      mouse_y = constrain(mouse_y, 0, LCD_HEIGHT-3);
+    }
     delay(1);
 
     if (is_in_update == true)
@@ -164,6 +183,10 @@ bool audioPlayFile(const char *file_name)
       lcdPrintf(5,16*0, green, "PLAY FILE : %s, fft %4d us, vol %d %%", file_name, fft_exe_time, audioGetVolume());
       lcdPrintf(5,16*1, green, "            %d fps, %d ms", lcdGetFps(), lcdGetFpsTime());
 
+      if (btHidhIsConnect() == true)
+      {
+        lcdDrawImage(&mouse_cursor, mouse_x, mouse_y);
+      }
 
       if (mode == 0)
       {

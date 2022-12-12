@@ -28,6 +28,7 @@ bool btHidhIsBegin(void);
 bool btHidhConnect(void);
 bool btHidhIsConnect(void);
 bool btHidhDisconnect(void);
+bool btHidhReconnect(bool enable);
 void btHidhStopCmd(uint32_t timeout_ms);
 
 uint32_t btHidhMouseAvailable(void);

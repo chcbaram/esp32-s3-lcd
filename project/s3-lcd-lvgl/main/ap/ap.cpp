@@ -80,6 +80,8 @@ void mainThread(void *args)
 
   btHidhBegin();
   btHidhConnect();
+  btHidhReconnect(true);
+
   
   logPrintf("lvglMain() begin\n");
   pre_time = millis();

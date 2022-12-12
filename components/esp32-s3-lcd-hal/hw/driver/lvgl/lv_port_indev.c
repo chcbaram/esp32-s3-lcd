@@ -1,6 +1,7 @@
 #include "lv_port_indev.h"
 #include "touch.h"
 #include "bt_hidh.h"
+#include "buzzer.h"
 
 
 static void touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
@@ -13,7 +14,7 @@ lv_indev_t * indev_touchpad;
 lv_indev_t * indev_mouse;
 LV_IMG_DECLARE(mouse_cursor_icon); 
 static bool is_mouse_pressed = false;
-
+static bool is_mouse_connected = false;
 
 void lv_port_indev_init(void)
 {
@@ -86,11 +87,6 @@ static void touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
   bool is_pressed = false;
 
 
-  // if (is_mouse_used == true)
-  // {
-  //   return;
-  // }
-
   info.count = 0;
   touchGetInfo(&info);
 
@@ -147,6 +143,26 @@ static void mouse_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
 {
   bt_hidh_mouse_info_t info;
 
+  
+
+  if (btHidhIsConnect() == true)
+  {
+    if (is_mouse_connected == false)
+    {
+      data->point.x = HW_LCD_WIDTH/2;
+      data->point.y = HW_LCD_HEIGHT/2;      
+      buzzerBeep(100);
+    }
+  }
+  else
+  {
+    is_mouse_connected = false;
+    data->state = LV_INDEV_STATE_REL;
+    data->point.x = HW_LCD_WIDTH;
+    data->point.y = HW_LCD_HEIGHT;
+    return;
+  }
+  is_mouse_connected = btHidhIsConnect();
 
   while (btHidhMouseAvailable() > 0)
   {

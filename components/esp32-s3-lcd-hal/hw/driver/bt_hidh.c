@@ -81,6 +81,7 @@ static bool is_begin = false;
 static bool is_mouse_saved = false;
 static bool is_thread_busy = false;
 static bool is_thread_stop = false;
+static bool is_reconnect = false;
 
 static SemaphoreHandle_t mutex_lock;
 static ble_mouse_info_t ble_mouse_info;
@@ -265,6 +266,12 @@ void btHidhCallback(void *handler_args, esp_event_base_t base, int32_t id, void 
       const uint8_t *bda = esp_hidh_dev_bda_get(param->close.dev);
       logPrintf("[__] " ESP_BD_ADDR_STR " CLOSE: %s\n", ESP_BD_ADDR_HEX(bda), esp_hidh_dev_name_get(param->close.dev));
       ble_mouse_info.is_open = false;
+
+      if (is_reconnect == true)
+      {
+        logPrintf("[__] Reconnect..\n");
+        btHidhConnect();
+      }
       break;
     }
 
@@ -456,6 +463,12 @@ bool btHidhDisconnect(void)
 
 
 
+  return true;
+}
+
+bool btHidhReconnect(bool enable)
+{
+  is_reconnect = enable;
   return true;
 }
 
