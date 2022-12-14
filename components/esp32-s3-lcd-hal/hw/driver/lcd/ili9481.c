@@ -76,6 +76,11 @@ bool ili9481InitRegs(void)
   writeParam(ILI9481_WR_POWER_SET,       (uint8_t[]){0x00, 0x40, 0x05}, 3);
 
 
+  writeParam(ILI9481_WR_VCOM_CONTROL,         (uint8_t[]){0x00, 0x07, 0x10}, 3);
+  writeParam(ILI9481_WR_PWOER_SET_FOR_NORMAL, (uint8_t[]){0x01, 0x02}, 2);
+  writeParam(ILI9481_WR_PANEL_DRIVING_SET,    (uint8_t[]){0x10, 0x3B, 0x00, 0x02, 0x11}, 5);
+  writeParam(ILI9481_WR_GAMMA_SET,            (uint8_t[]){0x00, 0x32, 0x36, 0x45, 0x06, 0x16, 0x37, 0x75, 0x77, 0x54, 0x0C, 0x00}, 12);
+
 
   writeParam(ILI9481_WR_FRAME_RATE_INV_CONTROL,(uint8_t[]){3}, 1); // 72Hz
 

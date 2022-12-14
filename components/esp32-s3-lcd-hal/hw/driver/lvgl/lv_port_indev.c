@@ -5,16 +5,19 @@
 
 
 static void touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
+#if defined(_USE_HW_BT_HIDH) && defined(CONFIG_BT_ENABLED)
 static void mouse_init(void);
 static void mouse_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
-
+#endif
 
 
 lv_indev_t * indev_touchpad;
 lv_indev_t * indev_mouse;
+#if defined(_USE_HW_BT_HIDH) && defined(CONFIG_BT_ENABLED)
 LV_IMG_DECLARE(mouse_cursor_icon); 
 static bool is_mouse_pressed = false;
 static bool is_mouse_connected = false;
+#endif
 
 void lv_port_indev_init(void)
 {
@@ -31,7 +34,9 @@ void lv_port_indev_init(void)
    */
 
   static lv_indev_drv_t indev_drv_touch;
+  #if defined(_USE_HW_BT_HIDH) && defined(CONFIG_BT_ENABLED)
   static lv_indev_drv_t indev_drv_mouse;
+  #endif
 
   /*------------------
     * Touchpad
@@ -52,7 +57,7 @@ void lv_port_indev_init(void)
   /*------------------
     * Mouse
     * -----------------*/
-
+  #if defined(_USE_HW_BT_HIDH) && defined(CONFIG_BT_ENABLED)
   /*Initialize your mouse if you have*/
   mouse_init();
 
@@ -66,6 +71,7 @@ void lv_port_indev_init(void)
   lv_obj_t * mouse_cursor = lv_img_create(lv_scr_act());
   lv_img_set_src(mouse_cursor, &mouse_cursor_icon);
   lv_indev_set_cursor(indev_mouse, mouse_cursor);  
+  #endif
 }
 
 /**********************
@@ -131,7 +137,7 @@ static void touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
 /*------------------
  * Mouse
  * -----------------*/
-
+#if defined(_USE_HW_BT_HIDH) && defined(CONFIG_BT_ENABLED)
 /*Initialize your mouse*/
 static void mouse_init(void)
 {
@@ -197,3 +203,4 @@ static void mouse_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
     data->state = LV_INDEV_STATE_REL;
   }
 }
+#endif
