@@ -8,6 +8,9 @@
 #ifndef SRC_HW_DRIVER_HANGUL_FONT_HAN_H_
 #define SRC_HW_DRIVER_HANGUL_FONT_HAN_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 #include <stdint.h>
 
@@ -819,5 +822,8 @@ const uint8_t K_font[360][32] __attribute__((aligned(64))) = {
 };
 
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SRC_HW_DRIVER_HANGUL_FONT_HAN_H_ */

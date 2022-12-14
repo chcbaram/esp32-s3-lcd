@@ -8,6 +8,9 @@
 #ifndef SRC_HW_DRIVER_HANGUL_HAN_H_
 #define SRC_HW_DRIVER_HANGUL_HAN_H_
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 #include <stdint.h>
 #include <string.h>
@@ -35,6 +38,10 @@ typedef struct
 
 
 uint16_t hanFontLoad(char *HanCode, han_font_t *FontPtr);
+uint16_t hanFontLoadUTF16(uint32_t utf16_code, han_font_t *FontPtr );
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SRC_HW_DRIVER_HANGUL_HAN_H_ */

@@ -67,6 +67,11 @@ static void event_handler(lv_event_t * e)
   }
 }
 
+
+
+
+
+
 void lvglMainInit(void)
 {
 
@@ -92,6 +97,13 @@ void lvglMainInit(void)
   //
   lv_obj_t * label;
 
+
+  label = lv_label_create(tab1);
+  lv_label_set_text(label, "이것은 한글(Korean) 조합형 시험 입니다.^^");
+  lv_obj_set_style_text_font(label, &lv_han_font_16, _LV_STYLE_STATE_CMP_SAME);
+  lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 50);
+
+
   lv_obj_t * btn1 = lv_btn_create(tab1);
   lv_obj_add_event_cb(btn1, event_handler, LV_EVENT_ALL, (void *)0);
   lv_obj_align(btn1, LV_ALIGN_CENTER, -120, 0);
@@ -102,15 +114,21 @@ void lvglMainInit(void)
   lv_label_set_text(label, "Play #1");
   lv_obj_center(label);
 
+
+
   lv_obj_t * btn2 = lv_btn_create(tab1);
   lv_obj_add_event_cb(btn2, event_handler, LV_EVENT_ALL, (void *)1);
   lv_obj_align(btn2, LV_ALIGN_CENTER, 0, 0);
   lv_obj_set_width(btn2, 100);
   lv_obj_set_height(btn2, 100);
-  
+
+
   label = lv_label_create(btn2);
-  lv_label_set_text(label, "Play #2");
+  lv_label_set_text(label, "한글 Font");
+  lv_obj_set_style_text_font(label, &lv_han_font_16, _LV_STYLE_STATE_CMP_SAME);
   lv_obj_center(label);
+
+  
 
   lv_obj_t * btn3 = lv_btn_create(tab1);
   lv_obj_add_event_cb(btn3, event_handler, LV_EVENT_ALL, (void *)2);

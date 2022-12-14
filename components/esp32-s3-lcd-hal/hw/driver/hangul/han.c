@@ -15,6 +15,7 @@
 void hanEngFontLoad(char *HanCode, han_font_t *FontPtr);
 void hanWanFontLoad(char *HanCode, han_font_t *FontPtr);
 void hanUniFontLoad(char *HanCode, han_font_t *FontPtr);
+void hanUniFontLoadUTF16(uint32_t utf16_code, han_font_t *FontPtr);
 uint16_t hanCnvCodeWan2Johab(uint16_t WanCode);
 
 
@@ -67,6 +68,42 @@ uint16_t hanFontLoad(char *HanCode, han_font_t *FontPtr )
   return FontPtr->Code_Type;
 
 }
+
+uint16_t hanFontLoadUTF16(uint32_t utf16_code, han_font_t *FontPtr )
+{
+  // 버퍼 초기화
+  memset(FontPtr->FontBuffer, 0x00, 32);
+
+
+  FontPtr->Code_Type = PHAN_NULL_CODE;
+  // 한글코드인지 감별
+  //
+  if( utf16_code == 0 || utf16_code == 0x0A )   // 문자열 마지막
+  {
+    FontPtr->Code_Type = PHAN_END_CODE;
+    FontPtr->Size_Char = 1;
+    return PHAN_END_CODE;
+  }
+  else if( utf16_code > 0xFF )              // 한글 코드인경우
+  {
+    FontPtr->Code_Type = PHAN_HANGUL_CODE;
+    FontPtr->Size_Char = 2;
+    hanUniFontLoadUTF16(utf16_code, FontPtr);
+    return PHAN_HANGUL_CODE;
+  }
+  else                                      // 영문 코드
+  {
+    FontPtr->Code_Type = PHAN_ENG_CODE;
+    FontPtr->Size_Char = 1;
+    hanEngFontLoad((char *)&utf16_code, FontPtr);
+    return PHAN_ENG_CODE;
+  }
+
+
+  return FontPtr->Code_Type;
+
+}
+
 
 void hanWanFontLoad(char *HanCode, han_font_t *FontPtr )   /* 한글 일반 폰트 생성 */
 {
@@ -155,6 +192,53 @@ void hanUniFontLoad(char *HanCode, han_font_t *FontPtr)
     for(i = 0; i < 32; i++)   FontPtr->FontBuffer[i] |= K_font[248 + uJonType*28+uJongsung][i];
   }
 }
+
+void hanUniFontLoadUTF16(uint32_t utf16_code, han_font_t *FontPtr)
+{
+  uint16_t i;
+  uint16_t utf16;
+
+  //static declaration 은 속도를 높이기 위한것임.
+  static uint16_t uChosung, uJoongsung, uJongsung, uChoType, uJooType,uJonType;
+
+
+
+
+  utf16 = utf16_code;
+
+  //seperate phoneme code
+  utf16 -= 0xac00;
+  uJongsung  = utf16 % 28;
+  utf16 /= 28;
+  uJoongsung = utf16 % 21;
+  uChosung   = utf16 / 21;
+
+
+  //make font index
+  uChosung   = UniChoIdxTbl[uChosung];    //Chosung index
+  uJoongsung = UniJooIdxTbl[uJoongsung];  //Joongsung index
+  uJongsung  = UniJonIdxTbl[uJongsung];   //Jongsung index
+
+
+  //decide a character type (몇번째 벌을 사용할지 결정)
+  uChoType = uJongsung ? ChoTypeCaseJongYes[uJoongsung]:ChoTypeCaseJongNo [uJoongsung];
+    //'ㄱ'(1) 이나 'ㅋ'(16) 인경우는
+  uJooType = ((uChosung == 0 || uChosung == 1 ||uChosung == 16 ) ? 0: 1) + (uJongsung ? 2: 0);
+  uJonType = JonType[uJoongsung];
+
+  for(i = 0; i<32; i++)
+  {
+    FontPtr->FontBuffer[i]  = (uint8_t)K_font[uChoType*20+uChosung][i];
+    FontPtr->FontBuffer[i] |= (uint8_t)K_font[160 + uJooType*22+uJoongsung][i];
+  }
+
+  //combine Jongsung
+  if(uJongsung)
+  {
+    for(i = 0; i < 32; i++)   FontPtr->FontBuffer[i] |= K_font[248 + uJonType*28+uJongsung][i];
+  }
+}
+
 
 void hanEngFontLoad(char *HanCode, han_font_t *FontPtr)
 {
