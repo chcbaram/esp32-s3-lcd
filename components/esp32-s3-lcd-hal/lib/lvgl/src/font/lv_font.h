@@ -245,6 +245,9 @@ LV_FONT_DECLARE(lv_font_unscii_16)
 LV_FONT_CUSTOM_DECLARE
 
 LV_FONT_DECLARE(lv_han_font_16)
+LV_FONT_DECLARE(lv_han_font_20)
+LV_FONT_DECLARE(lv_han_font_24)
+LV_FONT_DECLARE(lv_han_font_28)
 LV_FONT_DECLARE(lv_han_font_32)
 #endif
 

@@ -14,8 +14,12 @@
 typedef enum 
 {
   LVGL_FONT_16,
+  LVGL_FONT_20,
+  LVGL_FONT_24,
+  LVGL_FONT_28,
   LVGL_FONT_32,
 } LvglFontType_t;
+
 
 
 bool lvglInit(void);

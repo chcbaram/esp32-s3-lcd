@@ -47,9 +47,9 @@ void lvglMainInit(void)
 
 
   label = lv_label_create(tab1);
-  lv_label_set_text(label, "음악 플레이어 Music Player ^^");
-  lv_obj_set_style_text_font(label, &lv_han_font_16, _LV_STYLE_STATE_CMP_SAME);
-  lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 50);
+  lv_label_set_text(label, "메뉴를 선택하세요.");
+  lv_obj_set_style_text_font(label, &lv_han_font_28, _LV_STYLE_STATE_CMP_SAME);
+  lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 30);
 
 
   lv_obj_t * btn1 = lv_btn_create(tab1);

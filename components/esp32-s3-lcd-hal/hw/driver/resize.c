@@ -331,6 +331,97 @@ __attribute__((optimize("O2"))) void resizeImageFastGray(resize_image_t *src, re
    }
 }
 
+__attribute__((optimize("O2"))) void resizeImageFastGray8(resize_image_t *src, resize_image_t *dest)
+{
+  int destw = dest->w;
+  int desth = dest->h;
+  int i, j;
+  float src_dest_w = (float)(src->w-1)/(float)(dest->w-1);
+  float src_dest_h = (float)(src->h-1)/(float)(dest->h-1);
+  unsigned pixel;
+  uint8_t *p_src_data = (uint8_t *)src->p_data;
+  uint8_t *p_dst_data = (uint8_t *)dest->p_data;
+
+
+   uint8_t *line1, *line2;
+   uint8_t *dest_line;
+
+   int_least32_t xstep_c;
+   int_least32_t xstep_r;
+   int_least32_t ystep_c;
+   int_least32_t ystep_r;
+   int_least32_t xf, yf;
+   uint_least16_t cxf, cyf;
+   uint_least16_t oneminuscxf, oneminuscyf;
+   int_least32_t xstart_r;
+   int_least32_t ystart_r;
+
+   uint_least16_t xi, yi;
+   uint_least8_t s0, s1, s2, s3;
+   uint_least32_t s01f, s23f, soutf;
+
+   xstep_c = (int_least32_t) round2int32(src_dest_w * (1<<AFFINEWARP_ISHIFT));
+   xstep_r = (int_least32_t) round2int32(0 * (1<<AFFINEWARP_ISHIFT));
+   ystep_c = (int_least32_t) round2int32(0 * (1<<AFFINEWARP_ISHIFT));
+   ystep_r = (int_least32_t) round2int32(src_dest_h * (1<<AFFINEWARP_ISHIFT));
+
+
+   xstart_r = 0;
+   ystart_r = 0;
+
+   if (src->stride == 0)  src->stride  = src->w;
+   if (dest->stride == 0) dest->stride = dest->w;
+
+   if ((destw+dest->x) > dest->stride) destw = dest->stride - dest->x;
+
+   for (j=0; j<desth; j++)
+   {
+     xf = xstart_r;
+     yf = ystart_r;
+
+     yi = (uint_least16_t)(yf >> AFFINEWARP_ISHIFT);
+
+     line1 = (uint8_t *)&p_src_data[(yi)*src->stride];
+     line2 = (uint8_t *)&p_src_data[(yi+1)*src->stride];
+     dest_line = (uint8_t *)&p_dst_data[(j+dest->y)*(dest->stride) + dest->x];
+
+     for(i=0; i<destw; i++)
+     {
+       xi = (uint_least16_t)(xf >> AFFINEWARP_ISHIFT);
+       yi = (uint_least16_t)(yf >> AFFINEWARP_ISHIFT);
+
+       /* extract most significant 16 bits  */
+       cxf = (uint_least16_t)( (xf & AFFINEWARP_COEFFMASK) >> AFFINEWARP_QSHIFT);
+       cyf = (uint_least16_t)( (yf & AFFINEWARP_COEFFMASK) >> AFFINEWARP_QSHIFT);
+       oneminuscxf = 0xFFFF - cxf;
+       oneminuscyf = 0xFFFF - cyf;
+
+
+       s0 = line1[xi];
+       s1 = line1[xi+1];
+       s2 = line2[xi];
+       s3 = line2[xi+1];
+
+       // Interpolate
+       s01f  = oneminuscxf*s0 + cxf*s1;   // Interpolate points above
+       s23f  = oneminuscxf*s2 + cxf*s3;   // Interpolate points below
+
+       s01f >>= 8;
+       s23f >>= 8;
+       soutf = oneminuscyf*s01f + cyf*s23f; // Final interpolation
+       soutf = (soutf >> 24);
+       pixel = (uint_least8_t)soutf;
+
+       dest_line[i] = pixel;
+       xf += xstep_c;
+       yf += ystep_c;
+     }
+
+     xstart_r += xstep_r;
+     ystart_r += ystep_r;
+   }
+}
+
 
 __attribute__((optimize("O2"))) void resizeImageNearest(resize_image_t *src, resize_image_t *dest)
 {
@@ -375,4 +466,48 @@ __attribute__((optimize("O2"))) void resizeImageNearest(resize_image_t *src, res
   }
 }
 
+__attribute__((optimize("O2"))) void resizeImageNearest8(resize_image_t *src, resize_image_t *dest)
+{
+  int x_ratio = (int)((src->w<<16)/dest->w) +1;
+  int y_ratio = (int)((src->h<<16)/dest->h) +1;
+  int x2, y2;
+  int h2, w2;
+  int w1;
+  int stride_src;
+  int stride_dst;
+  uint8_t *p_src_data = (uint8_t *)src->p_data;
+  uint8_t *p_dst_data = (uint8_t *)dest->p_data;
+
+  w1 = src->w;
+  w2 = dest->w;
+  h2 = dest->h;
+
+  if (dest->stride > 0)
+  {
+    stride_dst = dest->stride;
+  }
+  else
+  {
+    stride_dst = w2;
+  }
+  if (src->stride > 0)
+  {
+    stride_src = src->stride;
+  }
+  else
+  {
+    stride_src = w1;
+  }
+
+
+  for (int i=0;i<h2;i++)
+  {
+    for (int j=0;j<w2;j++)
+    {
+      x2 = ((j*x_ratio)>>16) ;
+      y2 = ((i*y_ratio)>>16) ;
+      p_dst_data[((i+dest->y)*stride_dst)+j+dest->x] = p_src_data[(y2*stride_src)+x2];
+    }
+  }
+}
 
