@@ -412,7 +412,8 @@ void lvglFree(void * p);
 #define LV_FONT_CUSTOM_DECLARE
 
 /*Always set a default font*/
-#define LV_FONT_DEFAULT &lv_font_montserrat_14
+//#define LV_FONT_DEFAULT &lv_font_montserrat_14
+#define LV_FONT_DEFAULT &lv_han_font_16
 
 /*Enable handling large font and/or fonts with a lot of characters.
  *The limit depends on the font size, font face and bpp.
@@ -643,10 +644,10 @@ void lvglFree(void * p);
 
 /* JPG + split JPG decoder library.
  * Split JPG is a custom format optimized for embedded systems. */
-#define LV_USE_SJPG 0
+#define LV_USE_SJPG 1
 
 /*GIF decoder library*/
-#define LV_USE_GIF 0
+#define LV_USE_GIF 1
 
 /*QR code library*/
 #define LV_USE_QRCODE 0
@@ -744,7 +745,7 @@ void lvglFree(void * p);
     #define LV_FILE_EXPLORER_PATH_MAX_LEN        (128)
     /*Quick access bar, 1:use, 0:not use*/
     /*Requires: lv_list*/
-    #define LV_FILE_EXPLORER_QUICK_ACCESS        1
+    #define LV_FILE_EXPLORER_QUICK_ACCESS        0
 #endif
 
 /*==================

@@ -104,6 +104,12 @@ bool hanFont_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint3
   lvgl_font_t *p_han = (lvgl_font_t *)font->user_data;
 
 
+  if (unicode_letter > 0xFF)
+  {
+    if (unicode_letter < 0xAC00) return false;
+    if (unicode_letter > 0xD7AF) return false;
+  }
+
   if (unicode_letter <= 0xFF)
   {
     dsc_out->adv_w = p_han->font_w/2;   /*Horizontal space required by the glyph in [px]*/
@@ -149,6 +155,7 @@ void lvglFontInit(void)
   p_font->p_lv_font->dsc = NULL;                             /*Store any implementation specific data here*/
   p_font->p_lv_font->user_data = p_font;                     /*Optionally some extra user data*/
   p_font->p_lv_font->subpx = LV_FONT_SUBPX_NONE;
+  p_font->p_lv_font->fallback = &lv_font_montserrat_14;
 
   p_font = &han_font[1];
   p_font->font_w = 32;
@@ -161,6 +168,7 @@ void lvglFontInit(void)
   p_font->p_lv_font->dsc = NULL;                             /*Store any implementation specific data here*/
   p_font->p_lv_font->user_data = p_font;                     /*Optionally some extra user data*/
   p_font->p_lv_font->subpx = LV_FONT_SUBPX_NONE;
+  p_font->p_lv_font->fallback = &lv_font_montserrat_14;
 }
 
 lv_font_t *lvglGetFont(LvglFontType_t font_type)

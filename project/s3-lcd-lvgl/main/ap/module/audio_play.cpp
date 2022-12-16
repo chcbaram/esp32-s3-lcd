@@ -138,6 +138,13 @@ bool audioPlayFile(const char *file_name)
       mouse_x = constrain(mouse_x, 0, LCD_WIDTH-3);
       mouse_y = constrain(mouse_y, 0, LCD_HEIGHT-3);
     }
+    if (mouse_info.btn & 0x01)
+    {
+      touch_info.count = 1;
+      touch_info.point[0].id = 0;
+      touch_info.point[0].x = mouse_x;
+      touch_info.point[0].y = mouse_y;
+    }
     delay(1);
 
     if (is_in_update == true)

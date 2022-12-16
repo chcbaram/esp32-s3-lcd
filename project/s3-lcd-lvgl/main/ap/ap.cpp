@@ -59,19 +59,20 @@ void mainThread(void *args)
   uint32_t pre_time;
 
 
-  while(1)
-  {
-    touch_info_t info;
+  // while(1)
+  // {
+  //   touch_info_t info;
 
-    if (touchGetInfo(&info))
-    {
-      if (info.count > 0)
-      {
-        break;
-      }
-    }
-    delay(1);
-  }
+  //   if (touchGetInfo(&info))
+  //   {
+  //     if (info.count > 0)
+  //     {
+  //       break;
+  //     }
+  //   }
+  //   delay(1);
+  // }
+  delay(2000);
 
   lcdClear(black);
 

@@ -180,6 +180,7 @@ lv_obj_t * lv_file_explorer_get_header(lv_obj_t * obj)
     return explorer->head_area;
 }
 
+#if LV_FILE_EXPLORER_QUICK_ACCESS
 lv_obj_t * lv_file_explorer_get_quick_access_area(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -188,6 +189,7 @@ lv_obj_t * lv_file_explorer_get_quick_access_area(lv_obj_t * obj)
 
     return explorer->quick_access_area;
 }
+#endif
 
 lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj)
 {

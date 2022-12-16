@@ -2,70 +2,18 @@
 #include "module/audio_play.h"
 
 
-void lv_example_checkbox(lv_obj_t *scr);
-void lv_example_dropdown(lv_obj_t *scr);
+static void lv_example_checkbox(lv_obj_t *scr);
+static void lv_example_dropdown(lv_obj_t *scr);
+static void lv_example_slider(lv_obj_t *scr);
+static void slider_event_cb(lv_event_t * e);
+static void slider_event_cb2(lv_event_t * e);
+static void event_handler_file_explorer(lv_event_t * e);
+static void event_handler(lv_event_t * e);
+static void event_handler_dropdown(lv_event_t * e);
+static bool isEndWith(const char * str1, const char * str2);
 
 
-static void file_explorer_event_handler(lv_event_t * e)
-{
-  lv_event_code_t code = lv_event_get_code(e);
-  lv_obj_t * obj = lv_event_get_target(e);
-
-  if(code == LV_EVENT_VALUE_CHANGED) 
-  {
-    const char * cur_path =  lv_file_explorer_get_current_path(obj);
-    const char * sel_fn = lv_file_explorer_get_selected_file_name(obj);
-    uint16_t path_len = strlen(cur_path);
-    uint16_t fn_len = strlen(sel_fn);
-
-    if((path_len + fn_len) <= LV_FILE_EXPLORER_PATH_MAX_LEN) 
-    {
-      char file_info[LV_FILE_EXPLORER_PATH_MAX_LEN];
-
-      strcpy(file_info, cur_path);
-      strcat(file_info, sel_fn);
-
-      LV_LOG_USER("%s", file_info);
-      lvglSuspend();
-      audioPlayFile(sel_fn);
-      lvglResume();      
-    }
-    else    LV_LOG_USER("%s%s", cur_path, sel_fn);
-  }
-}
-
-
-static void event_handler(lv_event_t * e)
-{
-  lv_event_code_t code = lv_event_get_code(e);
-
-  if(code == LV_EVENT_CLICKED) 
-  {
-    LV_LOG_USER("Clicked");
-    buzzerBeep(100);
-    delay(200);
-
-    lvglSuspend();
-    if (e->user_data == (void *)0)
-    {
-      audioPlayFile("test2.wav");
-    }
-    else if (e->user_data == (void *)1)
-    {
-      audioPlayFile("test3.wav");
-    }
-    else
-    {
-      audioPlayFile("test.wav");
-    }
-    lvglResume();
-  }
-  else if(code == LV_EVENT_VALUE_CHANGED) 
-  {
-    LV_LOG_USER("Toggled");
-    buzzerBeep(100);
-  }
-}
+static lv_obj_t * slider_label;
 
 
 
@@ -90,7 +38,7 @@ void lvglMainInit(void)
   // explorer
   //
   lv_file_explorer_open_dir(file_explorer, "0:");
-  lv_obj_add_event_cb(file_explorer, file_explorer_event_handler, LV_EVENT_ALL, NULL);
+  lv_obj_add_event_cb(file_explorer, event_handler_file_explorer, LV_EVENT_ALL, NULL);
 
 
   // buttons
@@ -99,7 +47,7 @@ void lvglMainInit(void)
 
 
   label = lv_label_create(tab1);
-  lv_label_set_text(label, "이것은 한글(Korean) 조합형 시험 입니다.^^");
+  lv_label_set_text(label, "음악 플레이어 Music Player ^^");
   lv_obj_set_style_text_font(label, &lv_han_font_16, _LV_STYLE_STATE_CMP_SAME);
   lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 50);
 
@@ -124,7 +72,7 @@ void lvglMainInit(void)
 
 
   label = lv_label_create(btn2);
-  lv_label_set_text(label, "한글 Font");
+  lv_label_set_text(label, "Play #2");
   lv_obj_set_style_text_font(label, &lv_han_font_16, _LV_STYLE_STATE_CMP_SAME);
   lv_obj_center(label);
 
@@ -136,12 +84,14 @@ void lvglMainInit(void)
   lv_obj_set_width(btn3, 100);
   lv_obj_set_height(btn3, 100);
 
+
   label = lv_label_create(btn3);
   lv_label_set_text(label, "Play #3");
   lv_obj_center(label);
 
   lv_example_checkbox(tab3);
   lv_example_dropdown(tab3);
+  lv_example_slider(tab1);
 }
 
 
@@ -184,17 +134,6 @@ void lv_example_checkbox(lv_obj_t *scr)
     lv_obj_update_layout(cb);
 }
 
-static void event_handler_dropdown(lv_event_t * e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
-    if(code == LV_EVENT_VALUE_CHANGED) {
-        char buf[32];
-        lv_dropdown_get_selected_str(obj, buf, sizeof(buf));
-        LV_LOG_USER("Option: %s", buf);
-    }
-}
-
 void lv_example_dropdown(lv_obj_t *scr)
 {
 
@@ -213,4 +152,170 @@ void lv_example_dropdown(lv_obj_t *scr)
 
     lv_obj_align(dd, LV_ALIGN_TOP_MID, 0, 20);
     lv_obj_add_event_cb(dd, event_handler_dropdown, LV_EVENT_ALL, NULL);
+
+}
+
+void lv_example_slider(lv_obj_t *scr)
+{
+  /*Create a slider in the center of the display*/
+  lv_obj_t * slider = lv_slider_create(scr);
+  lv_obj_center(slider);
+  lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_ALL, NULL);
+  lv_slider_set_value(slider, audioGetVolume(), LV_ANIM_ON);
+
+  /*Create a label below the slider*/
+  slider_label = lv_label_create(scr);
+  lv_label_set_text(slider_label, "VOL");
+
+  lv_obj_align(slider, LV_ALIGN_BOTTOM_MID, 0, -20);
+  lv_obj_align_to(slider_label, slider, LV_ALIGN_OUT_LEFT_MID, -15, 0);
+
+  lv_obj_t * slider_label2;
+  slider_label2 = lv_label_create(scr);
+  lv_label_set_text(slider_label2, "LCD");
+
+  lv_obj_t * slider2 = lv_slider_create(scr);
+  lv_obj_center(slider2);
+  lv_obj_add_event_cb(slider2, slider_event_cb2, LV_EVENT_ALL, NULL);
+  lv_slider_set_value(slider2, lcdGetBackLight(), LV_ANIM_ON);
+  lv_slider_set_range(slider2, 10, 100);
+  lv_obj_align(slider2, LV_ALIGN_BOTTOM_MID, 0, -50);
+  lv_obj_align_to(slider_label2, slider2, LV_ALIGN_OUT_LEFT_MID, -15, 0);
+
+}
+
+void event_handler_file_explorer(lv_event_t * e)
+{
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t * obj = lv_event_get_target(e);
+
+  if(code == LV_EVENT_CLICKED) 
+  {
+    
+  }
+
+  if(code == LV_EVENT_VALUE_CHANGED) 
+  {
+    const char * cur_path =  lv_file_explorer_get_current_path(obj);
+    const char * sel_fn = lv_file_explorer_get_selected_file_name(obj);
+    uint16_t path_len = strlen(cur_path);
+    uint16_t fn_len = strlen(sel_fn);
+
+    if((path_len + fn_len) <= LV_FILE_EXPLORER_PATH_MAX_LEN) 
+    {
+      char file_info[LV_FILE_EXPLORER_PATH_MAX_LEN];
+
+      strcpy(file_info, cur_path);
+      strcat(file_info, sel_fn);
+
+      if (isEndWith(sel_fn, ".wav"))
+      {
+        LV_LOG_USER("%s", file_info);
+        lvglSuspend();
+        audioPlayFile(&file_info[2]);
+        lvglResume();      
+      }
+    }
+    else    
+    {
+      LV_LOG_USER("%s%s", cur_path, sel_fn);
+    }
+  }
+}
+
+static void slider_event_cb(lv_event_t * e)
+{
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t * slider = lv_event_get_target(e);
+  char buf[8];
+
+  if(code == LV_EVENT_VALUE_CHANGED)
+  {
+    // lv_snprintf(buf, sizeof(buf), "%d%%", (int)lv_slider_get_value(slider));
+    // lv_label_set_text(slider_label, buf);
+    // lv_obj_align_to(slider_label, slider, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
+
+    audioSetVolume(lv_slider_get_value(slider));
+  }
+}
+
+static void slider_event_cb2(lv_event_t * e)
+{
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t * slider = lv_event_get_target(e);
+
+  if(code == LV_EVENT_VALUE_CHANGED)
+  {
+    //lv_snprintf(buf, sizeof(buf), "%d%%", (int)lv_slider_get_value(slider));
+    //lv_label_set_text(slider_label, buf);
+    //lv_obj_align_to(slider_label, slider, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
+    int value = lv_slider_get_value(slider);
+
+    value = constrain(value, 10, 100);
+    lcdSetBackLight(value);
+  }
+}
+
+static void event_handler_dropdown(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t * obj = lv_event_get_target(e);
+    if(code == LV_EVENT_VALUE_CHANGED) {
+        char buf[32];
+        lv_dropdown_get_selected_str(obj, buf, sizeof(buf));
+        LV_LOG_USER("Option: %s", buf);
+    }
+}
+void event_handler(lv_event_t * e)
+{
+  lv_event_code_t code = lv_event_get_code(e);
+
+  if(code == LV_EVENT_CLICKED) 
+  {
+    LV_LOG_USER("Clicked");
+    buzzerBeep(100);
+    delay(200);
+
+    lvglSuspend();
+    if (e->user_data == (void *)0)
+    {
+      audioPlayFile("test2.wav");
+    }
+    else if (e->user_data == (void *)1)
+    {
+      audioPlayFile("test3.wav");
+    }
+    else
+    {
+      audioPlayFile("test.wav");
+    }
+    lvglResume();
+  }
+  else if(code == LV_EVENT_VALUE_CHANGED) 
+  {
+    LV_LOG_USER("Toggled");
+    buzzerBeep(100);
+  }
+}
+
+
+bool isEndWith(const char * str1, const char * str2)
+{
+    if(str1 == NULL || str2 == NULL)
+        return false;
+
+    uint16_t len1 = strlen(str1);
+    uint16_t len2 = strlen(str2);
+    if((len1 < len2) || (len1 == 0 || len2 == 0))
+        return false;
+
+    while(len2 >= 1) {
+        if(str2[len2 - 1] != str1[len1 - 1])
+            return false;
+
+        len2--;
+        len1--;
+    }
+
+    return true;
 }

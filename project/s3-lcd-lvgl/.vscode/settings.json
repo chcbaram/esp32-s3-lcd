@@ -12,6 +12,7 @@
     "lv_color.h": "c",
     "qbuffer.h": "c",
     "lv_malloc_builtin.h": "c",
-    "bt_hidh.h": "c"
+    "bt_hidh.h": "c",
+    "lv_file_explorer.h": "c"
   }
 }
