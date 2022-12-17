@@ -11,6 +11,7 @@ file(GLOB_RECURSE SRC_FILES_RECURSE
 set(requires 
   "esp32-s3-lcd-hal"
   "esp-dsp"
+  "esp_jpeg"
 )
 
 idf_component_register(
