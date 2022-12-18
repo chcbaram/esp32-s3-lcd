@@ -59,20 +59,26 @@ void mainThread(void *args)
   uint32_t pre_time;
 
 
-  // while(1)
-  // {
-  //   touch_info_t info;
+  pre_time = millis();
+  while(1)
+  {
+    touch_info_t info;
 
-  //   if (touchGetInfo(&info))
-  //   {
-  //     if (info.count > 0)
-  //     {
-  //       break;
-  //     }
-  //   }
-  //   delay(1);
-  // }
-  delay(2000);
+    if (touchGetInfo(&info))
+    {
+      if (info.count > 0)
+      {
+        if (millis()-pre_time > 200)
+          break;
+      }
+      else
+      {
+        pre_time = millis();
+      }
+    }
+    delay(10);
+  }
+  // delay(2000);
 
   // while(1)
   // {
