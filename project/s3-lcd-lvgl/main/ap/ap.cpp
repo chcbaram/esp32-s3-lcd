@@ -74,15 +74,20 @@ void mainThread(void *args)
   // }
   delay(2000);
 
+  // while(1)
+  // {
+  //   delay(1);
+  // }
+
   lcdClear(black);
 
   lvglInit();
   lvglMainInit();
-
+  
   btHidhBegin();
   btHidhConnect();
   btHidhReconnect(true);
-
+  touchSetEnable(false);
   
   logPrintf("lvglMain() begin\n");
   pre_time = millis();

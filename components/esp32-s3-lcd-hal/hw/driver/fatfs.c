@@ -217,17 +217,20 @@ void cliFatfs(cli_args_t *args)
 
   if (args->argc >= 1 && args->isStr(0, "dir") == true)
   {
-    DIR * d = opendir(base_path); 
+    DIR * d; 
     struct dirent * dir;
-    char buffer[300];
+    char file_path_str[128];
+    char path_str[128];
 
     if (args->argc == 1)
-      snprintf(buffer, 256, "%s", base_path);
+      snprintf(path_str, 128, "%s", base_path);
     else
-      snprintf(buffer, 256, "%s/%s", base_path, args->getStr(1));
+      snprintf(path_str, 128, "%s/%s", base_path, args->getStr(1));
+
+    d = opendir(path_str);
 
     cliPrintf("\n");
-    cliPrintf("dir %s\n", buffer);
+    cliPrintf("dir %s\n", path_str);
     if (d != NULL)
     {
       while ((dir = readdir(d)) != NULL) 
@@ -237,8 +240,8 @@ void cliFatfs(cli_args_t *args)
           FILE *f;
           int file_len = 0;
 
-          sprintf(buffer, "%s/%s", base_path, dir->d_name);
-          f = fopen(buffer, "r");
+          sprintf(file_path_str, "%s/%s", path_str, dir->d_name);
+          f = fopen(file_path_str, "r");
           if (f)
           {
             fseek(f, 0, SEEK_END);

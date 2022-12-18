@@ -308,6 +308,8 @@ void cliCmd(cli_args_t *args)
     ft6236_info_t info;
     ft6236_info_t info_pre;
 
+    info.count = 0;
+    info_pre.count = 0;
     cliGui()->initScreen(80, 24);
 
     while(cliKeepLoop())

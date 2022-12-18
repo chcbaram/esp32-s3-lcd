@@ -43,7 +43,9 @@ static bool is_end_with(const char * str1, const char * str2);
 /**********************
  *  STATIC VARIABLES
  **********************/
+#if LV_FILE_EXPLORER_QUICK_ACCESS
 static lv_style_t quick_access_list_btn_style;
+#endif
 
 const lv_obj_class_t lv_file_explorer_class = {
     .constructor_cb = lv_file_explorer_constructor,

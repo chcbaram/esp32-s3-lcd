@@ -13,6 +13,7 @@
     "qbuffer.h": "c",
     "lv_malloc_builtin.h": "c",
     "bt_hidh.h": "c",
-    "lv_file_explorer.h": "c"
+    "lv_file_explorer.h": "c",
+    "jpegd.h": "c"
   }
 }

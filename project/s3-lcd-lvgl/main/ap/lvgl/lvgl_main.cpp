@@ -227,7 +227,6 @@ static void slider_event_cb(lv_event_t * e)
 {
   lv_event_code_t code = lv_event_get_code(e);
   lv_obj_t * slider = lv_event_get_target(e);
-  char buf[8];
 
   if(code == LV_EVENT_VALUE_CHANGED)
   {

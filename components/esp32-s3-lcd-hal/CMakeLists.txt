@@ -25,6 +25,7 @@ set(requires
   "esp_adc"
   "app_update"
   "esp_hid"
+  "esp_jpeg"
   )
 
 

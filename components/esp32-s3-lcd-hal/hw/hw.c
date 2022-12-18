@@ -50,6 +50,7 @@ bool hwInit(void)
   lcdInit();
   touchInit();
   btHidhInit();
+  jpegdInit();
   
   return true;
 }

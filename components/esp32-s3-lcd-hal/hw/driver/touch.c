@@ -11,6 +11,7 @@ static void cliCmd(cli_args_t *args);
 
 
 static bool is_init = false;
+static bool is_enable = false;
 static uint16_t touch_width  = 480;
 static uint16_t touch_height = 320;
 
@@ -27,6 +28,7 @@ bool touchInit(void)
     touch_width  = ft6236GetWidth();
     touch_height = ft6236GetHeight();
     is_init = true;
+    is_enable = true;
   }
 
 
@@ -43,6 +45,7 @@ bool touchGetInfo(touch_info_t *p_info)
   ft6236_info_t ft6236_info;
 
   if (is_init == false) return false;
+  if (is_enable == false) return false;
 
   ret = ft6236GetInfo(&ft6236_info);
   if (ret == true)
@@ -59,6 +62,17 @@ bool touchGetInfo(touch_info_t *p_info)
   }
 
   return ret;
+}
+
+bool touchSetEnable(bool enable)
+{
+  is_enable = enable;
+  return true;
+}
+
+bool touchGetEnable(void)
+{
+  return is_enable;
 }
 
 void cliCmd(cli_args_t *args)
@@ -119,6 +133,9 @@ void cliCmd(cli_args_t *args)
     touch_info_t info;
     touch_info_t info_pre;
 
+    info.count = 0;
+    info_pre.count = 0;
+    
     cliGui()->initScreen(80, 24);
 
     while(cliKeepLoop())

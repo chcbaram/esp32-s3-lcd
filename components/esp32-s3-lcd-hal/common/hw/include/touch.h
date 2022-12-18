@@ -37,7 +37,8 @@ typedef struct
 
 bool touchInit(void);
 bool touchGetInfo(touch_info_t *p_info);
-
+bool touchSetEnable(bool enable);
+bool touchGetEnable(void);
 
 #endif
 

@@ -29,7 +29,7 @@
 #define _HW_DEF_RTOS_THREAD_PRI_BT_HIDH       5
 
 
-#define _HW_DEF_RTOS_THREAD_MEM_CLI           (4*1024)
+#define _HW_DEF_RTOS_THREAD_MEM_CLI           (8*1024)
 #define _HW_DEF_RTOS_THREAD_MEM_BUTTON        (1*1024)
 #define _HW_DEF_RTOS_THREAD_MEM_SD            (4*1024)
 #define _HW_DEF_RTOS_THREAD_MEM_TE            (2*1024)
@@ -50,6 +50,7 @@
 #define _USE_HW_BUZZER
 #define _USE_HW_LVGL
 #define _USE_HW_BT_HIDH
+#define _USE_HW_JPEGD
 
 
 #define _USE_HW_UART
@@ -98,6 +99,7 @@
 
 #define _USE_HW_AUDIO
 #define      HW_AUDIO_CMD_MAX_CH    4
+
 
 
 

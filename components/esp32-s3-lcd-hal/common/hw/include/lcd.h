@@ -29,6 +29,8 @@ extern "C" {
 #define GETB(c) ((c) & 0x1F)
 #define RGB2COLOR(r, g, b) ((((r>>3)<<11) | ((g>>2)<<5) | (b>>3)))
 
+#define LCD_GET_PIXEL_POS(x_pos, y_pos)   ((x_pos) * LCD_HEIGHT + (y_pos))
+
 
 #if 1
 enum class_color {

@@ -47,6 +47,7 @@ bool sdInit(void)
   slot_config.cmd = GPIO_NUM_44;
   slot_config.d0  = GPIO_NUM_40;
 
+  host.max_freq_khz = SDMMC_FREQ_DEFAULT;
 
   err = host.init();
   logPrintf("[%s] sdmmc_host_init()\n", err == ESP_OK ? "OK":"NG");

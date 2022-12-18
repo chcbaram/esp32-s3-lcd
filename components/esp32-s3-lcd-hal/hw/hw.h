@@ -36,6 +36,7 @@ extern "C" {
 #include "es8156.h"
 #include "lvgl.h"
 #include "bt_hidh.h"
+#include "jpegd.h"
 
 
 bool hwInit(void);
