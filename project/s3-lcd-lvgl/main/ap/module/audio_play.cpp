@@ -129,7 +129,7 @@ bool audioPlayFile(const char *file_name)
     if (btHidhMouseAvailable() > 0)
     {
       btHidhMouseRead(&mouse_info);
-      if (mouse_info.btn & 0x08)
+      if (mouse_info.btn & 0x08 || mouse_info.btn & 0x02)
       {
         break;
       }

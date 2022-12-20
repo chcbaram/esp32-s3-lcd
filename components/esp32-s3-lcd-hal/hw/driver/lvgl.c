@@ -6,6 +6,7 @@
 #include "lcd/ili9481.h"
 #include "driver/hangul/han.h"
 #include "resize.h"
+#include "cli.h"
 
 
 #define LVGL_FONT_MAX       5
@@ -25,9 +26,11 @@ typedef struct
 
 
 static void lvglFontInit(void);
+static void cliCmd(cli_args_t *args);
 
 
 static bool is_init = false;
+static bool is_enable = true;
 
 const lv_font_t lv_han_font_16;
 const lv_font_t lv_han_font_20;
@@ -55,6 +58,7 @@ bool lvglInit(void)
 
   is_init = true;
 
+  cliAdd("lvgl", cliCmd);
   return true;
 }
 
@@ -82,7 +86,10 @@ bool lvglUpdate(void)
   if (is_init == false)
     return false;
 
-  lv_task_handler();
+  if (is_enable == true)
+  {
+    lv_task_handler();
+  }
   return true;
 }
 
@@ -290,4 +297,35 @@ lv_font_t *lvglGetFont(LvglFontType_t font_type)
   return p_font;
 }
 
+void cliCmd(cli_args_t *args)
+{
+  bool ret = false;
+
+
+  if (args->argc == 1 && args->isStr(0, "info"))
+  {
+    cliPrintf("is_init   : %d\n", is_init);
+    cliPrintf("is_enable : %d\n", is_enable);
+    ret = true;
+  }
+
+  if (args->argc == 1 && args->isStr(0, "enable"))
+  {
+    is_enable = true;
+    ret = true;
+  }
+
+  if (args->argc == 1 && args->isStr(0, "disable"))
+  {
+    is_enable = false;
+    ret = true;
+  }
+
+  if (ret == false)
+  {
+    cliPrintf("lvgl info\n");
+    cliPrintf("lvgl enable\n");
+    cliPrintf("lvgl disable\n");
+  }
+}
 #endif

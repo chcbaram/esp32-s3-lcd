@@ -59,31 +59,32 @@ void mainThread(void *args)
   uint32_t pre_time;
 
 
-  pre_time = millis();
-  while(1)
-  {
-    touch_info_t info;
+  // pre_time = millis();
+  // while(1)
+  // {
+  //   touch_info_t info;
 
-    if (touchGetInfo(&info))
-    {
-      if (info.count > 0)
-      {
-        if (millis()-pre_time > 200)
-          break;
-      }
-      else
-      {
-        pre_time = millis();
-      }
-    }
-    delay(10);
-  }
-  // delay(2000);
+  //   if (touchGetInfo(&info))
+  //   {
+  //     if (info.count > 0)
+  //     {
+  //       if (millis()-pre_time > 200)
+  //         break;
+  //     }
+  //     else
+  //     {
+  //       pre_time = millis();
+  //     }
+  //   }
+  //   delay(10);
+  // }
+  delay(2000);
 
   // while(1)
   // {
   //   delay(1);
   // }
+  touchSetEnable(false);
 
   lcdClear(black);
 
@@ -93,7 +94,6 @@ void mainThread(void *args)
   btHidhBegin();
   btHidhConnect();
   btHidhReconnect(true);
-  touchSetEnable(false);
   
   logPrintf("lvglMain() begin\n");
   pre_time = millis();

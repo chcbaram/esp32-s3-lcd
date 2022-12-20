@@ -45,7 +45,11 @@ bool touchGetInfo(touch_info_t *p_info)
   ft6236_info_t ft6236_info;
 
   if (is_init == false) return false;
-  if (is_enable == false) return false;
+  if (is_enable == false)
+  {
+    p_info->count = 0;
+    return false;
+  } 
 
   ret = ft6236GetInfo(&ft6236_info);
   if (ret == true)

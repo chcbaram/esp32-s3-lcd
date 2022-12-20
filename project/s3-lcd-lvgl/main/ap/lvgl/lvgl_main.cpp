@@ -10,6 +10,7 @@ static void slider_event_cb2(lv_event_t * e);
 static void event_handler_file_explorer(lv_event_t * e);
 static void event_handler(lv_event_t * e);
 static void event_handler_dropdown(lv_event_t * e);
+static void event_handler_touch(lv_event_t * e);
 static bool isEndWith(const char * str1, const char * str2);
 
 
@@ -41,6 +42,15 @@ void lvglMainInit(void)
   lv_obj_add_event_cb(file_explorer, event_handler_file_explorer, LV_EVENT_ALL, NULL);
 
 
+  lv_obj_t * cb;
+  cb = lv_checkbox_create(tab1);
+  lv_checkbox_set_text(cb, "Touch");
+  lv_obj_add_event_cb(cb, event_handler_touch, LV_EVENT_ALL, NULL);
+  lv_obj_align(cb, LV_ALIGN_TOP_LEFT, 0, 0);
+  if (touchGetEnable())
+    lv_obj_add_state(cb, LV_STATE_CHECKED);
+
+
   // buttons
   //
   lv_obj_t * label;
@@ -50,7 +60,7 @@ void lvglMainInit(void)
   lv_label_set_text(label, "메뉴를 선택하세요.");
   lv_obj_set_style_text_font(label, &lv_han_font_28, _LV_STYLE_STATE_CMP_SAME);
   lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 30);
-
+  
 
   lv_obj_t * btn1 = lv_btn_create(tab1);
   lv_obj_add_event_cb(btn1, event_handler, LV_EVENT_ALL, (void *)0);
@@ -94,6 +104,22 @@ void lvglMainInit(void)
   lv_example_slider(tab1);
 }
 
+static void event_handler_touch(lv_event_t * e)
+{
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t * obj = lv_event_get_target(e);
+  if(code == LV_EVENT_VALUE_CHANGED) 
+  {
+    if (lv_obj_get_state(obj) & LV_STATE_CHECKED)
+    {
+      touchSetEnable(true);
+    }
+    else
+    {
+      touchSetEnable(false);
+    }
+  }
+}
 
 static void event_handler_checkbox(lv_event_t * e)
 {
@@ -213,6 +239,15 @@ void event_handler_file_explorer(lv_event_t * e)
         LV_LOG_USER("%s", file_info);
         lvglSuspend();
         audioPlayFile(&file_info[2]);
+        lvglResume();      
+      }
+      if (isEndWith(sel_fn, ".jpg"))
+      {
+        LV_LOG_USER("%s", file_info);
+        lvglSuspend();
+        jpegdDrawFile(0, 0, 0, 0, &file_info[2]);
+        lcdRequestDraw();
+        delay(1000);
         lvglResume();      
       }
     }

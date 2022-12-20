@@ -82,6 +82,8 @@ static bool is_mouse_saved = false;
 static bool is_thread_busy = false;
 static bool is_thread_stop = false;
 static bool is_reconnect = false;
+static bool is_log = false;
+
 
 static SemaphoreHandle_t mutex_lock;
 static ble_mouse_info_t ble_mouse_info;
@@ -245,13 +247,32 @@ void btHidhCallback(void *handler_args, esp_event_base_t base, int32_t id, void 
     case ESP_HIDH_INPUT_EVENT: 
     {        
       mouse_info.btn = param->input.data[0];
-      mouse_info.x   = (param->input.data[3] & 0x0F) << 12;
-      mouse_info.x  |= (param->input.data[2] & 0xFF) <<  4;
-      mouse_info.x >>= 4;
-      mouse_info.y   = (param->input.data[4] & 0xFF) <<  8;
-      mouse_info.y  |= (param->input.data[3] & 0xF0) <<  0;
-      mouse_info.y >>= 4;
 
+      if (param->input.length == 6)
+      {
+        mouse_info.x   = (param->input.data[2] & 0xFF) <<  8;
+        mouse_info.x  |= (param->input.data[1] & 0xFF) <<  0;
+        mouse_info.y   = (param->input.data[4] & 0xFF) <<  8;
+        mouse_info.y  |= (param->input.data[3] & 0xFF) <<  0;
+      }
+      else
+      {
+        mouse_info.x   = (param->input.data[3] & 0x0F) << 12;
+        mouse_info.x  |= (param->input.data[2] & 0xFF) <<  4;
+        mouse_info.x >>= 4;
+        mouse_info.y   = (param->input.data[4] & 0xFF) <<  8;
+        mouse_info.y  |= (param->input.data[3] & 0xF0) <<  0;
+        mouse_info.y >>= 4;
+      }
+      if (is_log == true)
+      {
+        cliPrintf("IN %d : ", param->input.length);
+        for (int i=0; i<param->input.length; i++)
+        {
+          cliPrintf("0x%02X ", param->input.data[i]);    
+        }
+        cliPrintf("\n");
+      }
       qbufferWrite(&ble_mouse_info.msg_q, (uint8_t *)&mouse_info, 1);
       break;
     }
@@ -667,6 +688,16 @@ void cliCmd(cli_args_t *args)
     ret = true;
   }
 
+  if (args->argc == 2 && args->isStr(0, "log"))
+  {
+    bool log_flag;
+
+    log_flag = args->getData(1) > 0 ? true:false;
+    is_log = log_flag;
+    cliPrintf("is_log : %d\n", is_log);
+    ret = true;
+  }
+
   if (ret == false)
   {
     cliPrintf("bt_hidh info\n");
@@ -679,6 +710,7 @@ void cliCmd(cli_args_t *args)
     cliPrintf("bt_hidh disconnect\n");    
     cliPrintf("bt_hidh stop\n");
     cliPrintf("bt_hidh mouse info\n");
+    cliPrintf("bt_hidh log 0~1\n");
   }
 }
 #else
